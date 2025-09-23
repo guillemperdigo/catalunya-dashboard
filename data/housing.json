@@ -1,0 +1,233 @@
+{
+  "overview": {
+    "avg_price_m2": 3650.0,
+    "price_change_1y": 8.2,
+    "avg_rent": 1250.0,
+    "rent_change_1y": 12.5,
+    "new_units_built": 24500,
+    "mortgage_volume": 18500000000.0
+  },
+  "prices": [
+    {
+      "region": "Barcelona ciutat",
+      "year": 2024,
+      "avg_price_sale": 4850.0,
+      "avg_price_rent": 1680.0,
+      "price_change_1y_pct": 6.2,
+      "rent_change_1y_pct": 15.8,
+      "affordability_index": 42.5
+    },
+    {
+      "region": "Barcelonès",
+      "year": 2024,
+      "avg_price_sale": 3920.0,
+      "avg_price_rent": 1420.0,
+      "price_change_1y_pct": 7.1,
+      "rent_change_1y_pct": 13.2,
+      "affordability_index": 38.2
+    },
+    {
+      "region": "Vallès Occidental",
+      "year": 2024,
+      "avg_price_sale": 2980.0,
+      "avg_price_rent": 1150.0,
+      "price_change_1y_pct": 9.5,
+      "rent_change_1y_pct": 11.8,
+      "affordability_index": 31.5
+    },
+    {
+      "region": "Baix Llobregat",
+      "year": 2024,
+      "avg_price_sale": 3450.0,
+      "avg_price_rent": 1280.0,
+      "price_change_1y_pct": 8.7,
+      "rent_change_1y_pct": 12.9,
+      "affordability_index": 35.8
+    },
+    {
+      "region": "Vallès Oriental",
+      "year": 2024,
+      "avg_price_sale": 2750.0,
+      "avg_price_rent": 1080.0,
+      "price_change_1y_pct": 10.2,
+      "rent_change_1y_pct": 10.5,
+      "affordability_index": 29.3
+    },
+    {
+      "region": "Maresme",
+      "year": 2024,
+      "avg_price_sale": 3150.0,
+      "avg_price_rent": 1200.0,
+      "price_change_1y_pct": 7.8,
+      "rent_change_1y_pct": 9.8,
+      "affordability_index": 33.1
+    },
+    {
+      "region": "Garraf",
+      "year": 2024,
+      "avg_price_sale": 3680.0,
+      "avg_price_rent": 1350.0,
+      "price_change_1y_pct": 11.5,
+      "rent_change_1y_pct": 14.2,
+      "affordability_index": 36.9
+    },
+    {
+      "region": "Tarragonès",
+      "year": 2024,
+      "avg_price_sale": 2420.0,
+      "avg_price_rent": 950.0,
+      "price_change_1y_pct": 6.8,
+      "rent_change_1y_pct": 8.5,
+      "affordability_index": 26.8
+    },
+    {
+      "region": "Gironès",
+      "year": 2024,
+      "avg_price_sale": 2890.0,
+      "avg_price_rent": 1100.0,
+      "price_change_1y_pct": 8.9,
+      "rent_change_1y_pct": 11.2,
+      "affordability_index": 30.5
+    },
+    {
+      "region": "Segrià",
+      "year": 2024,
+      "avg_price_sale": 1950.0,
+      "avg_price_rent": 780.0,
+      "price_change_1y_pct": 5.2,
+      "rent_change_1y_pct": 7.1,
+      "affordability_index": 22.1
+    }
+  ],
+  "construction": [
+    {
+      "region": "Barcelona ciutat",
+      "year": 2024,
+      "new_housing_units": 3200,
+      "building_permits": 4100,
+      "construction_starts": 3800,
+      "construction_completions": 2950
+    },
+    {
+      "region": "Barcelonès",
+      "year": 2024,
+      "new_housing_units": 2800,
+      "building_permits": 3500,
+      "construction_starts": 3200,
+      "construction_completions": 2650
+    },
+    {
+      "region": "Vallès Occidental",
+      "year": 2024,
+      "new_housing_units": 4200,
+      "building_permits": 5100,
+      "construction_starts": 4800,
+      "construction_completions": 3950
+    },
+    {
+      "region": "Baix Llobregat",
+      "year": 2024,
+      "new_housing_units": 2950,
+      "building_permits": 3600,
+      "construction_starts": 3400,
+      "construction_completions": 2780
+    },
+    {
+      "region": "Vallès Oriental",
+      "year": 2024,
+      "new_housing_units": 1850,
+      "building_permits": 2200,
+      "construction_starts": 2100,
+      "construction_completions": 1720
+    },
+    {
+      "region": "Maresme",
+      "year": 2024,
+      "new_housing_units": 1650,
+      "building_permits": 1950,
+      "construction_starts": 1850,
+      "construction_completions": 1520
+    },
+    {
+      "region": "Garraf",
+      "year": 2024,
+      "new_housing_units": 950,
+      "building_permits": 1200,
+      "construction_starts": 1100,
+      "construction_completions": 880
+    },
+    {
+      "region": "Tarragonès",
+      "year": 2024,
+      "new_housing_units": 1450,
+      "building_permits": 1750,
+      "construction_starts": 1650,
+      "construction_completions": 1350
+    },
+    {
+      "region": "Gironès",
+      "year": 2024,
+      "new_housing_units": 1200,
+      "building_permits": 1450,
+      "construction_starts": 1380,
+      "construction_completions": 1120
+    },
+    {
+      "region": "Segrià",
+      "year": 2024,
+      "new_housing_units": 850,
+      "building_permits": 1050,
+      "construction_starts": 980,
+      "construction_completions": 780
+    }
+  ],
+  "mortgages": [
+    {
+      "region": "Barcelona ciutat",
+      "year": 2024,
+      "avg_mortgage_amount": 385000.0,
+      "avg_interest_rate": 3.8,
+      "mortgage_approvals": 12500,
+      "default_rate": 2.1
+    },
+    {
+      "region": "Barcelonès",
+      "year": 2024,
+      "avg_mortgage_amount": 320000.0,
+      "avg_interest_rate": 3.7,
+      "mortgage_approvals": 15200,
+      "default_rate": 1.9
+    },
+    {
+      "region": "Vallès Occidental",
+      "year": 2024,
+      "avg_mortgage_amount": 285000.0,
+      "avg_interest_rate": 3.6,
+      "mortgage_approvals": 18500,
+      "default_rate": 1.7
+    },
+    {
+      "region": "Baix Llobregat",
+      "year": 2024,
+      "avg_mortgage_amount": 310000.0,
+      "avg_interest_rate": 3.7,
+      "mortgage_approvals": 14800,
+      "default_rate": 1.8
+    },
+    {
+      "region": "Vallès Oriental",
+      "year": 2024,
+      "avg_mortgage_amount": 265000.0,
+      "avg_interest_rate": 3.5,
+      "mortgage_approvals": 9200,
+      "default_rate": 1.5
+    }
+  ],
+  "historical_prices": [
+    {"year": 2020, "avg_price_m2": 2980, "avg_rent": 980},
+    {"year": 2021, "avg_price_m2": 3150, "avg_rent": 1050},
+    {"year": 2022, "avg_price_m2": 3320, "avg_rent": 1120},
+    {"year": 2023, "avg_price_m2": 3450, "avg_rent": 1180},
+    {"year": 2024, "avg_price_m2": 3650, "avg_rent": 1250}
+  ]
+}

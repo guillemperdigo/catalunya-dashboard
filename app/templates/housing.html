@@ -1,0 +1,378 @@
+{% extends "layout.html" %}
+
+{% block content %}
+<!-- Page Header -->
+<section class="mb-12">
+    <h1 class="text-4xl font-serif font-bold text-nyt-black mb-4">
+        Habitatge a Catalunya
+    </h1>
+    <p class="text-lg text-nyt-gray">
+        Preus de compra i lloguer, construcció d'habitatges i mercat hipotecari
+    </p>
+</section>
+
+<!-- Overview Cards -->
+<section class="grid md:grid-cols-6 gap-6 mb-12">
+    <div class="bg-white border border-nyt-gray-light rounded-lg p-6 text-center">
+        <div class="text-3xl font-mono font-bold text-nyt-black mb-2">
+            {{ "{:,}".format(overview.avg_price_m2|int).replace(",", ".") }}€
+        </div>
+        <div class="text-sm text-nyt-gray">Preu mitjà/m²</div>
+    </div>
+    
+    <div class="bg-white border border-nyt-gray-light rounded-lg p-6 text-center">
+        <div class="text-3xl font-mono font-bold {{ 'text-red-600' if overview.price_change_1y >= 5 else 'text-orange-600' if overview.price_change_1y >= 0 else 'text-green-600' }} mb-2">
+            +{{ "%.1f"|format(overview.price_change_1y) }}%
+        </div>
+        <div class="text-sm text-nyt-gray">Pujada preus 1a</div>
+    </div>
+    
+    <div class="bg-white border border-nyt-gray-light rounded-lg p-6 text-center">
+        <div class="text-3xl font-mono font-bold text-nyt-black mb-2">
+            {{ "{:,}".format(overview.avg_rent|int).replace(",", ".") }}€
+        </div>
+        <div class="text-sm text-nyt-gray">Lloguer mitjà</div>
+    </div>
+    
+    <div class="bg-white border border-nyt-gray-light rounded-lg p-6 text-center">
+        <div class="text-3xl font-mono font-bold {{ 'text-red-600' if overview.rent_change_1y >= 10 else 'text-orange-600' if overview.rent_change_1y >= 5 else 'text-green-600' }} mb-2">
+            +{{ "%.1f"|format(overview.rent_change_1y) }}%
+        </div>
+        <div class="text-sm text-nyt-gray">Pujada lloguer 1a</div>
+    </div>
+    
+    <div class="bg-white border border-nyt-gray-light rounded-lg p-6 text-center">
+        <div class="text-3xl font-mono font-bold text-nyt-black mb-2">
+            {{ "{:,}".format(overview.new_units_built).replace(",", ".") }}
+        </div>
+        <div class="text-sm text-nyt-gray">Nous habitatges</div>
+    </div>
+    
+    <div class="bg-white border border-nyt-gray-light rounded-lg p-6 text-center">
+        <div class="text-3xl font-mono font-bold text-nyt-black mb-2">
+            {{ "%.1f"|format(overview.mortgage_volume / 1000000000) }}B€
+        </div>
+        <div class="text-sm text-nyt-gray">Volum hipoteques</div>
+    </div>
+</section>
+
+<!-- Main Content Grid -->
+<div class="grid lg:grid-cols-3 gap-8">
+    
+    <!-- Price Charts -->
+    <div class="lg:col-span-2 space-y-6">
+        
+        <!-- Sale Prices Chart -->
+        <div class="bg-white border border-nyt-gray-light rounded-lg p-6">
+            <h2 class="text-xl font-serif font-semibold text-nyt-black mb-6">
+                Preus de compra per m² per comarques
+            </h2>
+            <div id="sale-prices-chart" class="h-80"></div>
+        </div>
+        
+        <!-- Rent Prices Chart -->
+        <div class="bg-white border border-nyt-gray-light rounded-lg p-6">
+            <h2 class="text-xl font-serif font-semibold text-nyt-black mb-6">
+                Preus de lloguer mensual per comarques
+            </h2>
+            <div id="rent-prices-chart" class="h-80"></div>
+        </div>
+        
+        <!-- Historical Evolution -->
+        <div class="bg-white border border-nyt-gray-light rounded-lg p-6">
+            <h2 class="text-xl font-serif font-semibold text-nyt-black mb-6">
+                Evolució històrica de preus (Catalunya)
+            </h2>
+            <div id="historical-chart" class="h-80"></div>
+        </div>
+    </div>
+    
+    <!-- Sidebar -->
+    <div class="space-y-6">
+        
+        <!-- Price Change Analysis -->
+        <div class="bg-white border border-nyt-gray-light rounded-lg p-6">
+            <h3 class="text-lg font-serif font-semibold text-nyt-black mb-4">
+                Variació de preus anual
+            </h3>
+            <div id="price-change-chart" class="h-64"></div>
+        </div>
+        
+        <!-- Affordability Index -->
+        <div class="bg-white border border-nyt-gray-light rounded-lg p-6">
+            <h3 class="text-lg font-serif font-semibold text-nyt-black mb-4">
+                Índex d'accessibilitat
+            </h3>
+            <div class="space-y-3">
+                {% for region in prices[:5] %}
+                <div class="flex items-center justify-between">
+                    <span class="text-sm text-nyt-gray">{{ region.region }}</span>
+                    <div class="flex items-center">
+                        <div class="w-24 bg-gray-200 rounded-full h-2 mr-2">
+                            <div class="bg-{{ 'red' if region.affordability_index > 35 else 'orange' if region.affordability_index > 25 else 'green' }}-500 h-2 rounded-full" 
+                                 style="width: {{ (region.affordability_index / 50 * 100)|round }}%"></div>
+                        </div>
+                        <span class="text-xs font-mono text-nyt-black">{{ "%.1f"|format(region.affordability_index) }}%</span>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+            <div class="mt-4 text-xs text-nyt-gray">
+                % dels ingressos familiars destinats a habitatge
+            </div>
+        </div>
+        
+        <!-- Construction Activity -->
+        <div class="bg-white border border-nyt-gray-light rounded-lg p-6">
+            <h3 class="text-lg font-serif font-semibold text-nyt-black mb-4">
+                Activitat constructora
+            </h3>
+            <div id="construction-chart" class="h-48"></div>
+        </div>
+    </div>
+</div>
+
+<!-- Detailed Tables -->
+<section class="mt-12 space-y-8">
+    
+    <!-- Prices Table -->
+    <div class="bg-white border border-nyt-gray-light rounded-lg overflow-hidden">
+        <div class="px-6 py-4 border-b border-nyt-gray-light">
+            <h2 class="text-xl font-serif font-semibold text-nyt-black">
+                Preus per comarques
+            </h2>
+        </div>
+        
+        <div class="overflow-x-auto">
+            <table class="w-full">
+                <thead class="bg-nyt-bg border-b border-nyt-gray-light">
+                    <tr>
+                        <th class="px-6 py-4 text-left text-sm font-semibold text-nyt-black">Comarca</th>
+                        <th class="px-6 py-4 text-right text-sm font-semibold text-nyt-black">Compra €/m²</th>
+                        <th class="px-6 py-4 text-right text-sm font-semibold text-nyt-black">Var. compra</th>
+                        <th class="px-6 py-4 text-right text-sm font-semibold text-nyt-black">Lloguer €/mes</th>
+                        <th class="px-6 py-4 text-right text-sm font-semibold text-nyt-black">Var. lloguer</th>
+                        <th class="px-6 py-4 text-right text-sm font-semibold text-nyt-black">Accessibilitat</th>
+                    </tr>
+                </thead>
+                <tbody class="divide-y divide-nyt-gray-light">
+                    {% for region in prices %}
+                    <tr class="hover:bg-nyt-bg transition-colors">
+                        <td class="px-6 py-4">
+                            <span class="text-sm font-semibold text-nyt-black">{{ region.region }}</span>
+                        </td>
+                        <td class="px-6 py-4 text-right">
+                            <span class="font-mono text-sm text-nyt-black">
+                                {{ "{:,}".format(region.avg_price_sale|int).replace(",", ".") }}€
+                            </span>
+                        </td>
+                        <td class="px-6 py-4 text-right">
+                            <span class="inline-flex items-center px-2 py-1 rounded text-xs font-medium {{ 'bg-red-100 text-red-800' if region.price_change_1y_pct > 8 else 'bg-orange-100 text-orange-800' if region.price_change_1y_pct > 5 else 'bg-green-100 text-green-800' }}">
+                                ▲ {{ "%.1f"|format(region.price_change_1y_pct) }}%
+                            </span>
+                        </td>
+                        <td class="px-6 py-4 text-right">
+                            <span class="font-mono text-sm text-nyt-black">
+                                {{ "{:,}".format(region.avg_price_rent|int).replace(",", ".") }}€
+                            </span>
+                        </td>
+                        <td class="px-6 py-4 text-right">
+                            <span class="inline-flex items-center px-2 py-1 rounded text-xs font-medium {{ 'bg-red-100 text-red-800' if region.rent_change_1y_pct > 12 else 'bg-orange-100 text-orange-800' if region.rent_change_1y_pct > 8 else 'bg-green-100 text-green-800' }}">
+                                ▲ {{ "%.1f"|format(region.rent_change_1y_pct) }}%
+                            </span>
+                        </td>
+                        <td class="px-6 py-4 text-right">
+                            <span class="font-mono text-sm {{ 'text-red-600' if region.affordability_index > 35 else 'text-orange-600' if region.affordability_index > 25 else 'text-green-600' }}">
+                                {{ "%.1f"|format(region.affordability_index) }}%
+                            </span>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+    
+    <!-- Construction Table -->
+    <div class="bg-white border border-nyt-gray-light rounded-lg overflow-hidden">
+        <div class="px-6 py-4 border-b border-nyt-gray-light">
+            <h2 class="text-xl font-serif font-semibold text-nyt-black">
+                Construcció d'habitatges per comarques
+            </h2>
+        </div>
+        
+        <div class="overflow-x-auto">
+            <table class="w-full">
+                <thead class="bg-nyt-bg border-b border-nyt-gray-light">
+                    <tr>
+                        <th class="px-6 py-4 text-left text-sm font-semibold text-nyt-black">Comarca</th>
+                        <th class="px-6 py-4 text-right text-sm font-semibold text-nyt-black">Nous habitatges</th>
+                        <th class="px-6 py-4 text-right text-sm font-semibold text-nyt-black">Llicències</th>
+                        <th class="px-6 py-4 text-right text-sm font-semibold text-nyt-black">Inicis obra</th>
+                        <th class="px-6 py-4 text-right text-sm font-semibold text-nyt-black">Finalitzacions</th>
+                    </tr>
+                </thead>
+                <tbody class="divide-y divide-nyt-gray-light">
+                    {% for region in construction %}
+                    <tr class="hover:bg-nyt-bg transition-colors">
+                        <td class="px-6 py-4">
+                            <span class="text-sm font-semibold text-nyt-black">{{ region.region }}</span>
+                        </td>
+                        <td class="px-6 py-4 text-right">
+                            <span class="font-mono text-sm text-nyt-black">
+                                {{ "{:,}".format(region.new_housing_units).replace(",", ".") }}
+                            </span>
+                        </td>
+                        <td class="px-6 py-4 text-right">
+                            <span class="font-mono text-sm text-nyt-gray">
+                                {{ "{:,}".format(region.building_permits).replace(",", ".") }}
+                            </span>
+                        </td>
+                        <td class="px-6 py-4 text-right">
+                            <span class="font-mono text-sm text-nyt-gray">
+                                {{ "{:,}".format(region.construction_starts).replace(",", ".") }}
+                            </span>
+                        </td>
+                        <td class="px-6 py-4 text-right">
+                            <span class="font-mono text-sm text-nyt-gray">
+                                {{ "{:,}".format(region.construction_completions).replace(",", ".") }}
+                            </span>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</section>
+{% endblock %}
+
+{% block scripts %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const pricesData = {{ prices|tojson }};
+    const constructionData = {{ construction|tojson }};
+    const historicalData = {{ historical_prices|tojson }};
+    
+    const chartConfig = {displayModeBar: false, responsive: true};
+    
+    // Sale Prices Chart
+    const salePricesTrace = {
+        x: pricesData.map(r => r.region),
+        y: pricesData.map(r => r.avg_price_sale),
+        type: 'bar',
+        marker: {color: '#0b57d0', opacity: 0.8},
+        hovertemplate: '%{x}<br>Preu: %{y:,.0f}€/m²<extra></extra>'
+    };
+    
+    const salePricesLayout = {
+        margin: { t: 20, r: 20, b: 80, l: 80 },
+        paper_bgcolor: 'white',
+        plot_bgcolor: 'white',
+        font: { family: 'Inter, system-ui, Arial', size: 12 },
+        xaxis: { tickangle: -45, showgrid: false, showline: true, linecolor: '#e5e5e5' },
+        yaxis: { showgrid: true, gridcolor: '#e5e5e5', showline: true, linecolor: '#e5e5e5', tickformat: ',.0f' }
+    };
+    
+    Plotly.newPlot('sale-prices-chart', [salePricesTrace], salePricesLayout, chartConfig);
+    
+    // Rent Prices Chart
+    const rentPricesTrace = {
+        x: pricesData.map(r => r.region),
+        y: pricesData.map(r => r.avg_price_rent),
+        type: 'bar',
+        marker: {color: '#16a34a', opacity: 0.8},
+        hovertemplate: '%{x}<br>Lloguer: %{y:,.0f}€/mes<extra></extra>'
+    };
+    
+    const rentPricesLayout = {
+        margin: { t: 20, r: 20, b: 80, l: 80 },
+        paper_bgcolor: 'white',
+        plot_bgcolor: 'white',
+        font: { family: 'Inter, system-ui, Arial', size: 12 },
+        xaxis: { tickangle: -45, showgrid: false, showline: true, linecolor: '#e5e5e5' },
+        yaxis: { showgrid: true, gridcolor: '#e5e5e5', showline: true, linecolor: '#e5e5e5', tickformat: ',.0f' }
+    };
+    
+    Plotly.newPlot('rent-prices-chart', [rentPricesTrace], rentPricesLayout, chartConfig);
+    
+    // Historical Chart
+    const historicalTraces = [
+        {
+            x: historicalData.map(d => d.year),
+            y: historicalData.map(d => d.avg_price_m2),
+            type: 'scatter',
+            mode: 'lines+markers',
+            name: 'Compra €/m²',
+            line: {color: '#0b57d0', width: 3},
+            yaxis: 'y'
+        },
+        {
+            x: historicalData.map(d => d.year),
+            y: historicalData.map(d => d.avg_rent),
+            type: 'scatter',
+            mode: 'lines+markers',
+            name: 'Lloguer €/mes',
+            line: {color: '#16a34a', width: 3},
+            yaxis: 'y2'
+        }
+    ];
+    
+    const historicalLayout = {
+        margin: { t: 20, r: 80, b: 40, l: 80 },
+        paper_bgcolor: 'white',
+        plot_bgcolor: 'white',
+        font: { family: 'Inter, system-ui, Arial', size: 12 },
+        xaxis: { showgrid: true, gridcolor: '#e5e5e5' },
+        yaxis: { title: 'Preu compra €/m²', showgrid: true, gridcolor: '#e5e5e5', side: 'left' },
+        yaxis2: { title: 'Lloguer €/mes', overlaying: 'y', side: 'right', showgrid: false },
+        legend: { x: 0.02, y: 0.98 }
+    };
+    
+    Plotly.newPlot('historical-chart', historicalTraces, historicalLayout, chartConfig);
+    
+    // Price Change Chart
+    const priceChangeTrace = {
+        x: pricesData.map(r => r.region),
+        y: pricesData.map(r => r.price_change_1y_pct),
+        type: 'bar',
+        marker: {
+            color: pricesData.map(r => r.price_change_1y_pct > 8 ? '#dc2626' : r.price_change_1y_pct > 5 ? '#ea580c' : '#16a34a'),
+            opacity: 0.8
+        },
+        hovertemplate: '%{x}<br>Variació: %{y:.1f}%<extra></extra>'
+    };
+    
+    const priceChangeLayout = {
+        margin: { t: 20, r: 20, b: 80, l: 60 },
+        paper_bgcolor: 'white',
+        plot_bgcolor: 'white',
+        font: { family: 'Inter, system-ui, Arial', size: 10 },
+        xaxis: { tickangle: -45, showgrid: false, showline: true, linecolor: '#e5e5e5' },
+        yaxis: { showgrid: true, gridcolor: '#e5e5e5', ticksuffix: '%' }
+    };
+    
+    Plotly.newPlot('price-change-chart', [priceChangeTrace], priceChangeLayout, chartConfig);
+    
+    // Construction Chart
+    const constructionTrace = {
+        x: constructionData.slice(0, 5).map(r => r.region),
+        y: constructionData.slice(0, 5).map(r => r.new_housing_units),
+        type: 'bar',
+        marker: {color: '#7c3aed', opacity: 0.8},
+        hovertemplate: '%{x}<br>Nous habitatges: %{y:,}<extra></extra>'
+    };
+    
+    const constructionLayout = {
+        margin: { t: 20, r: 20, b: 80, l: 60 },
+        paper_bgcolor: 'white',
+        plot_bgcolor: 'white',
+        font: { family: 'Inter, system-ui, Arial', size: 10 },
+        xaxis: { tickangle: -45, showgrid: false, showline: true, linecolor: '#e5e5e5' },
+        yaxis: { showgrid: true, gridcolor: '#e5e5e5', tickformat: ',.0f' }
+    };
+    
+    Plotly.newPlot('construction-chart', [constructionTrace], constructionLayout, chartConfig);
+});
+</script>
+{% endblock %}

@@ -71,3 +71,41 @@ class DemographicsOverview(BaseModel):
     death_rate: float
     life_expectancy: float
     regions: List[PopulationData]
+
+
+# Models per Habitatge
+class HousingPriceData(BaseModel):
+    region: str
+    year: int
+    avg_price_sale: float  # €/m²
+    avg_price_rent: float  # €/mes
+    price_change_1y_pct: float
+    rent_change_1y_pct: float
+    affordability_index: float  # % ingressos per habitatge
+
+
+class ConstructionData(BaseModel):
+    region: str
+    year: int
+    new_housing_units: int
+    building_permits: int
+    construction_starts: int
+    construction_completions: int
+
+
+class MortgageData(BaseModel):
+    region: str
+    year: int
+    avg_mortgage_amount: float
+    avg_interest_rate: float
+    mortgage_approvals: int
+    default_rate: float
+
+
+class HousingOverview(BaseModel):
+    avg_price_m2: float
+    price_change_1y: float
+    avg_rent: float
+    rent_change_1y: float
+    new_units_built: int
+    mortgage_volume: float

@@ -136,6 +136,29 @@ async def demographics_page(request: Request):
         raise HTTPException(status_code=500, detail=f"Error carregant demografia: {str(e)}")
 
 
+@app.get("/housing", response_class=HTMLResponse)
+async def housing_page(request: Request):
+    """Pàgina d'habitatge"""
+    try:
+        # Carregar dades d'habitatge
+        housing_path = os.path.join("data", "housing.json")
+        with open(housing_path, 'r', encoding='utf-8') as f:
+            data = json.load(f)
+        
+        return templates.TemplateResponse("housing.html", {
+            "request": request,
+            "overview": data["overview"],
+            "prices": data["prices"],
+            "construction": data["construction"],
+            "mortgages": data["mortgages"],
+            "historical_prices": data["historical_prices"],
+            "title": "Habitatge a Catalunya"
+        })
+    
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Error carregant habitatge: {str(e)}")
+
+
 # Endpoint de salut
 @app.get("/health")
 async def health_check():
