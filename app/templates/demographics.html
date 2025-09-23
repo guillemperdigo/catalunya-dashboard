@@ -1,0 +1,274 @@
+{% extends "layout.html" %}
+
+{% block content %}
+<!-- Page Header -->
+<section class="mb-12">
+    <h1 class="text-4xl font-serif font-bold text-nyt-black mb-4">
+        Demografia de Catalunya
+    </h1>
+    <p class="text-lg text-nyt-gray">
+        Evolució poblacional, natalitat i estructura per edats a Catalunya
+    </p>
+</section>
+
+<!-- Overview Cards -->
+<section class="grid md:grid-cols-5 gap-6 mb-12">
+    <div class="bg-white border border-nyt-gray-light rounded-lg p-6 text-center">
+        <div class="text-3xl font-mono font-bold text-nyt-black mb-2">
+            {{ "%.1f"|format(overview.total_population / 1000000) }}M
+        </div>
+        <div class="text-sm text-nyt-gray">Població total</div>
+    </div>
+    
+    <div class="bg-white border border-nyt-gray-light rounded-lg p-6 text-center">
+        <div class="text-3xl font-mono font-bold {{ 'text-green-600' if overview.population_change_1y >= 0 else 'text-red-600' }} mb-2">
+            {{ "%.1f"|format(overview.population_change_1y) }}%
+        </div>
+        <div class="text-sm text-nyt-gray">Creixement anual</div>
+    </div>
+    
+    <div class="bg-white border border-nyt-gray-light rounded-lg p-6 text-center">
+        <div class="text-3xl font-mono font-bold text-nyt-black mb-2">
+            {{ "%.1f"|format(overview.birth_rate) }}‰
+        </div>
+        <div class="text-sm text-nyt-gray">Taxa natalitat</div>
+    </div>
+    
+    <div class="bg-white border border-nyt-gray-light rounded-lg p-6 text-center">
+        <div class="text-3xl font-mono font-bold text-nyt-black mb-2">
+            {{ "%.1f"|format(overview.death_rate) }}‰
+        </div>
+        <div class="text-sm text-nyt-gray">Taxa mortalitat</div>
+    </div>
+    
+    <div class="bg-white border border-nyt-gray-light rounded-lg p-6 text-center">
+        <div class="text-3xl font-mono font-bold text-nyt-black mb-2">
+            {{ "%.1f"|format(overview.life_expectancy) }}
+        </div>
+        <div class="text-sm text-nyt-gray">Esperança de vida</div>
+    </div>
+</section>
+
+<!-- Main Content Grid -->
+<div class="grid lg:grid-cols-3 gap-8">
+    
+    <!-- Population by Region Chart -->
+    <div class="lg:col-span-2">
+        <div class="bg-white border border-nyt-gray-light rounded-lg p-6">
+            <h2 class="text-xl font-serif font-semibold text-nyt-black mb-6">
+                Població per comarques
+            </h2>
+            <div id="population-chart" class="h-96"></div>
+        </div>
+    </div>
+    
+    <!-- Age Structure -->
+    <div>
+        <div class="bg-white border border-nyt-gray-light rounded-lg p-6 mb-6">
+            <h3 class="text-lg font-serif font-semibold text-nyt-black mb-4">
+                Estructura per edats (Catalunya)
+            </h3>
+            <div id="age-structure-chart" class="h-64"></div>
+        </div>
+        
+        <!-- Population Growth Rate -->
+        <div class="bg-white border border-nyt-gray-light rounded-lg p-6">
+            <h3 class="text-lg font-serif font-semibold text-nyt-black mb-4">
+                Creixement poblacional
+            </h3>
+            <div id="growth-chart" class="h-48"></div>
+        </div>
+    </div>
+</div>
+
+<!-- Regional Details Table -->
+<section class="mt-12">
+    <div class="bg-white border border-nyt-gray-light rounded-lg overflow-hidden">
+        <div class="px-6 py-4 border-b border-nyt-gray-light">
+            <h2 class="text-xl font-serif font-semibold text-nyt-black">
+                Detalls per comarques
+            </h2>
+        </div>
+        
+        <div class="overflow-x-auto">
+            <table class="w-full">
+                <thead class="bg-nyt-bg border-b border-nyt-gray-light">
+                    <tr>
+                        <th class="px-6 py-4 text-left text-sm font-semibold text-nyt-black">
+                            Comarca
+                        </th>
+                        <th class="px-6 py-4 text-right text-sm font-semibold text-nyt-black">
+                            Població
+                        </th>
+                        <th class="px-6 py-4 text-right text-sm font-semibold text-nyt-black">
+                            Creixement
+                        </th>
+                        <th class="px-6 py-4 text-right text-sm font-semibold text-nyt-black">
+                            Natalitat
+                        </th>
+                        <th class="px-6 py-4 text-right text-sm font-semibold text-nyt-black">
+                            Mortalitat
+                        </th>
+                        <th class="px-6 py-4 text-right text-sm font-semibold text-nyt-black">
+                            Saldo migratori
+                        </th>
+                    </tr>
+                </thead>
+                <tbody class="divide-y divide-nyt-gray-light">
+                    {% for region in regions %}
+                    <tr class="hover:bg-nyt-bg transition-colors">
+                        <td class="px-6 py-4">
+                            <span class="text-sm font-semibold text-nyt-black">
+                                {{ region.region }}
+                            </span>
+                        </td>
+                        <td class="px-6 py-4 text-right">
+                            <span class="font-mono text-sm text-nyt-black">
+                                {{ "{:,}".format(region.population).replace(",", ".") }}
+                            </span>
+                        </td>
+                        <td class="px-6 py-4 text-right">
+                            {% if region.population_change_pct >= 0 %}
+                                <span class="inline-flex items-center px-2 py-1 rounded text-xs font-medium bg-green-100 text-green-800">
+                                    ▲ {{ "%.1f"|format(region.population_change_pct) }}%
+                                </span>
+                            {% else %}
+                                <span class="inline-flex items-center px-2 py-1 rounded text-xs font-medium bg-red-100 text-red-800">
+                                    ▼ {{ "%.1f"|format(region.population_change_pct|abs) }}%
+                                </span>
+                            {% endif %}
+                        </td>
+                        <td class="px-6 py-4 text-right">
+                            <span class="font-mono text-sm text-nyt-black">
+                                {{ "%.1f"|format(region.birth_rate) }}‰
+                            </span>
+                        </td>
+                        <td class="px-6 py-4 text-right">
+                            <span class="font-mono text-sm text-nyt-black">
+                                {{ "%.1f"|format(region.death_rate) }}‰
+                            </span>
+                        </td>
+                        <td class="px-6 py-4 text-right">
+                            {% if region.migration_balance >= 0 %}
+                                <span class="font-mono text-sm text-green-600">
+                                    +{{ "{:,}".format(region.migration_balance).replace(",", ".") }}
+                                </span>
+                            {% else %}
+                                <span class="font-mono text-sm text-red-600">
+                                    {{ "{:,}".format(region.migration_balance).replace(",", ".") }}
+                                </span>
+                            {% endif %}
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</section>
+{% endblock %}
+
+{% block scripts %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Population by Region Chart
+    const populationData = {{ regions|tojson }};
+    
+    const populationTrace = {
+        x: populationData.map(r => r.region),
+        y: populationData.map(r => r.population),
+        type: 'bar',
+        marker: {
+            color: '#0b57d0',
+            opacity: 0.8
+        },
+        hovertemplate: '%{x}<br>Població: %{y:,}<extra></extra>'
+    };
+    
+    const populationLayout = {
+        margin: { t: 20, r: 20, b: 80, l: 80 },
+        paper_bgcolor: 'white',
+        plot_bgcolor: 'white',
+        font: { family: 'Inter, system-ui, Arial', size: 12 },
+        xaxis: {
+            tickangle: -45,
+            showgrid: false,
+            showline: true,
+            linecolor: '#e5e5e5'
+        },
+        yaxis: {
+            showgrid: true,
+            gridcolor: '#e5e5e5',
+            gridwidth: 1,
+            showline: true,
+            linecolor: '#e5e5e5',
+            tickformat: '.0s'
+        }
+    };
+    
+    Plotly.newPlot('population-chart', [populationTrace], populationLayout, {displayModeBar: false, responsive: true});
+    
+    // Age Structure Chart (Pie)
+    const ageData = {{ age_groups[0]|tojson }};
+    
+    const ageTrace = {
+        values: [ageData.age_0_14, ageData.age_15_64, ageData.age_65_plus],
+        labels: ['0-14 anys', '15-64 anys', '65+ anys'],
+        type: 'pie',
+        marker: {
+            colors: ['#16a34a', '#0b57d0', '#dc2626']
+        },
+        textinfo: 'label+percent',
+        textposition: 'outside',
+        hovertemplate: '%{label}<br>%{value:,} persones<br>%{percent}<extra></extra>'
+    };
+    
+    const ageLayout = {
+        margin: { t: 20, r: 20, b: 20, l: 20 },
+        paper_bgcolor: 'white',
+        font: { family: 'Inter, system-ui, Arial', size: 11 },
+        showlegend: false
+    };
+    
+    Plotly.newPlot('age-structure-chart', [ageTrace], ageLayout, {displayModeBar: false, responsive: true});
+    
+    // Growth Rate Chart
+    const growthTrace = {
+        x: populationData.map(r => r.region),
+        y: populationData.map(r => r.population_change_pct),
+        type: 'bar',
+        marker: {
+            color: populationData.map(r => r.population_change_pct >= 0 ? '#16a34a' : '#dc2626'),
+            opacity: 0.8
+        },
+        hovertemplate: '%{x}<br>Creixement: %{y:.1f}%<extra></extra>'
+    };
+    
+    const growthLayout = {
+        margin: { t: 20, r: 20, b: 80, l: 60 },
+        paper_bgcolor: 'white',
+        plot_bgcolor: 'white',
+        font: { family: 'Inter, system-ui, Arial', size: 10 },
+        xaxis: {
+            tickangle: -45,
+            showgrid: false,
+            showline: true,
+            linecolor: '#e5e5e5'
+        },
+        yaxis: {
+            showgrid: true,
+            gridcolor: '#e5e5e5',
+            gridwidth: 1,
+            showline: true,
+            linecolor: '#e5e5e5',
+            ticksuffix: '%',
+            zeroline: true,
+            zerolinecolor: '#111111',
+            zerolinewidth: 1
+        }
+    };
+    
+    Plotly.newPlot('growth-chart', [growthTrace], growthLayout, {displayModeBar: false, responsive: true});
+});
+</script>
+{% endblock %}

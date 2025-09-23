@@ -5,6 +5,8 @@ from fastapi.responses import HTMLResponse
 from app.api.companies import router as companies_router
 from app.db import db
 import random
+import json
+import os
 
 # Crear aplicació FastAPI
 app = FastAPI(
@@ -111,6 +113,27 @@ async def company_detail(request: Request, ticker: str):
         raise
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Error carregant detalls de {ticker}: {str(e)}")
+
+
+@app.get("/demographics", response_class=HTMLResponse)
+async def demographics_page(request: Request):
+    """Pàgina de demografia"""
+    try:
+        # Carregar dades demogràfiques
+        demographics_path = os.path.join("data", "demographics.json")
+        with open(demographics_path, 'r', encoding='utf-8') as f:
+            data = json.load(f)
+        
+        return templates.TemplateResponse("demographics.html", {
+            "request": request,
+            "overview": data["overview"],
+            "regions": data["regions"],
+            "age_groups": data["age_groups"],
+            "title": "Demografia de Catalunya"
+        })
+    
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Error carregant demografia: {str(e)}")
 
 
 # Endpoint de salut

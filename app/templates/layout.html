@@ -52,17 +52,50 @@
                 <!-- Logo/Títol -->
                 <div class="flex items-center">
                     <a href="/" class="text-2xl font-serif font-bold text-nyt-black hover:text-nyt-accent transition-colors">
-                        Catalunya Stocks
+                        Catalunya Dashboard
                     </a>
                 </div>
                 
                 <!-- Navegació -->
-                <nav class="flex space-x-8">
+                <nav class="flex space-x-6">
                     <a href="/" class="text-nyt-gray hover:text-nyt-black transition-colors py-2 border-b-2 border-transparent hover:border-nyt-accent">
                         Inici
                     </a>
-                    <a href="/companies" class="text-nyt-gray hover:text-nyt-black transition-colors py-2 border-b-2 border-transparent hover:border-nyt-accent">
-                        Empreses
+                    
+                    <!-- Dropdown Economia -->
+                    <div class="relative group">
+                        <button class="text-nyt-gray hover:text-nyt-black transition-colors py-2 border-b-2 border-transparent group-hover:border-nyt-accent flex items-center">
+                            Economia
+                            <svg class="w-4 h-4 ml-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
+                            </svg>
+                        </button>
+                        <div class="absolute top-full left-0 mt-1 w-48 bg-white border border-nyt-gray-light rounded-md shadow-lg opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 z-50">
+                            <a href="/companies" class="block px-4 py-2 text-sm text-nyt-gray hover:bg-nyt-bg hover:text-nyt-black">
+                                📈 Borsa
+                            </a>
+                            <a href="/economy/employment" class="block px-4 py-2 text-sm text-nyt-gray hover:bg-nyt-bg hover:text-nyt-black">
+                                💼 Treball
+                            </a>
+                            <a href="/economy/gdp" class="block px-4 py-2 text-sm text-nyt-gray hover:bg-nyt-bg hover:text-nyt-black">
+                                💰 PIB
+                            </a>
+                        </div>
+                    </div>
+                    
+                    <!-- Demografia -->
+                    <a href="/demographics" class="text-nyt-gray hover:text-nyt-black transition-colors py-2 border-b-2 border-transparent hover:border-nyt-accent">
+                        Demografia
+                    </a>
+                    
+                    <!-- Habitatge -->
+                    <a href="/housing" class="text-nyt-gray hover:text-nyt-black transition-colors py-2 border-b-2 border-transparent hover:border-nyt-accent">
+                        Habitatge
+                    </a>
+                    
+                    <!-- Medi Ambient -->
+                    <a href="/environment" class="text-nyt-gray hover:text-nyt-black transition-colors py-2 border-b-2 border-transparent hover:border-nyt-accent">
+                        Medi Ambient
                     </a>
                 </nav>
             </div>
