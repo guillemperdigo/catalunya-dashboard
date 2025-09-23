@@ -1,6 +1,6 @@
-# Catalunya Stocks Dashboard
+# Catalunya Dashboard
 
-Dashboard elegant i minimalista per seguir indicadors bursàtils d'empreses catalanes, inspirat en el disseny de The New York Times.
+Dashboard elegant i minimalista per visualitzar dades de Catalunya, començant per indicadors bursàtils d'empreses catalanes. Inspirat en el disseny de The New York Times.
 
 ## Característiques
 
@@ -153,11 +153,22 @@ Crear nous routers a `app/api/` i incloure'ls a `app/main.py`.
 
 ## Extensibilitat futura
 
+### Mòdul Stocks (actual)
 - **Dades reals**: Connectar a APIs financeres (Alpha Vantage, Yahoo Finance)
 - **Base de dades**: Migrar de fixtures a PostgreSQL/SQLite
+- **Alertes**: Notificacions de preu i volum
+
+### Nous mòduls
+- **Demografia**: Població, natalitat, immigració per comarques
+- **Economia**: PIB, atur, salaris per sectors i regions
+- **Medi ambient**: Qualitat de l'aire, consum energètic, reciclatge
+- **Turisme**: Visitants, ocupació hotelera, esdeveniments
+- **Educació**: Centres, resultats acadèmics, inversió
+- **Sanitat**: Hospitals, llistes d'espera, indicadors de salut
+
+### Funcionalitats generals
 - **Internacionalització**: Suport per català/espanyol/anglès
-- **Autenticació**: Usuaris i favorits
-- **Notificacions**: Alertes de preu
+- **Autenticació**: Usuaris i dashboards personalitzats
 - **Mobile app**: PWA o React Native
 
 ## Llicència
