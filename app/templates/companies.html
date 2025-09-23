@@ -1,0 +1,262 @@
+{% extends "layout.html" %}
+
+{% block content %}
+<!-- Page Header -->
+<section class="mb-12">
+    <h1 class="text-4xl font-serif font-bold text-nyt-black mb-4">
+        Totes les empreses
+    </h1>
+    <p class="text-lg text-nyt-gray">
+        Llistat complet d'empreses catalanes cotitzades en borsa
+    </p>
+</section>
+
+<!-- Filters and Search -->
+<section class="bg-white border border-nyt-gray-light rounded-lg p-6 mb-8">
+    <div class="grid md:grid-cols-3 gap-4">
+        <!-- Search -->
+        <div>
+            <label for="search" class="block text-sm font-medium text-nyt-black mb-2">
+                Cercar empresa
+            </label>
+            <input 
+                type="text" 
+                id="search" 
+                placeholder="Nom o ticker..."
+                class="w-full px-3 py-2 border border-nyt-gray-light rounded-md focus:outline-none focus:ring-2 focus:ring-nyt-accent focus:border-transparent"
+            >
+        </div>
+        
+        <!-- Exchange Filter -->
+        <div>
+            <label for="exchange-filter" class="block text-sm font-medium text-nyt-black mb-2">
+                Borsa
+            </label>
+            <select 
+                id="exchange-filter"
+                class="w-full px-3 py-2 border border-nyt-gray-light rounded-md focus:outline-none focus:ring-2 focus:ring-nyt-accent focus:border-transparent"
+            >
+                <option value="">Totes les borses</option>
+                {% for exchange in exchanges %}
+                <option value="{{ exchange }}">{{ exchange }}</option>
+                {% endfor %}
+            </select>
+        </div>
+        
+        <!-- Sector Filter -->
+        <div>
+            <label for="sector-filter" class="block text-sm font-medium text-nyt-black mb-2">
+                Sector
+            </label>
+            <select 
+                id="sector-filter"
+                class="w-full px-3 py-2 border border-nyt-gray-light rounded-md focus:outline-none focus:ring-2 focus:ring-nyt-accent focus:border-transparent"
+            >
+                <option value="">Tots els sectors</option>
+                {% for sector in sectors %}
+                <option value="{{ sector }}">{{ sector }}</option>
+                {% endfor %}
+            </select>
+        </div>
+    </div>
+    
+    <div class="mt-4 flex justify-between items-center">
+        <button 
+            id="clear-filters"
+            class="text-sm text-nyt-gray hover:text-nyt-black transition-colors"
+        >
+            Netejar filtres
+        </button>
+        <div id="results-count" class="text-sm text-nyt-gray">
+            Mostrant {{ companies|length }} empreses
+        </div>
+    </div>
+</section>
+
+<!-- Companies Table -->
+<section class="bg-white border border-nyt-gray-light rounded-lg overflow-hidden">
+    <div class="overflow-x-auto">
+        <table class="w-full" id="companies-table">
+            <thead class="bg-nyt-bg border-b border-nyt-gray-light">
+                <tr>
+                    <th class="px-6 py-4 text-left text-sm font-semibold text-nyt-black">
+                        Empresa
+                    </th>
+                    <th class="px-6 py-4 text-left text-sm font-semibold text-nyt-black">
+                        Ticker
+                    </th>
+                    <th class="px-6 py-4 text-left text-sm font-semibold text-nyt-black">
+                        Borsa
+                    </th>
+                    <th class="px-6 py-4 text-left text-sm font-semibold text-nyt-black">
+                        Sector
+                    </th>
+                    <th class="px-6 py-4 text-right text-sm font-semibold text-nyt-black">
+                        Preu
+                    </th>
+                    <th class="px-6 py-4 text-right text-sm font-semibold text-nyt-black">
+                        Variació
+                    </th>
+                    <th class="px-6 py-4 text-center text-sm font-semibold text-nyt-black">
+                        Detalls
+                    </th>
+                </tr>
+            </thead>
+            <tbody class="divide-y divide-nyt-gray-light">
+                {% for company in companies %}
+                <tr class="company-row hover:bg-nyt-bg transition-colors" 
+                    data-name="{{ company.name|lower }}"
+                    data-ticker="{{ company.ticker|lower }}"
+                    data-exchange="{{ company.exchange }}"
+                    data-sector="{{ company.sector }}">
+                    
+                    <!-- Company Name -->
+                    <td class="px-6 py-4">
+                        <div>
+                            <div class="text-sm font-semibold text-nyt-black">
+                                {{ company.name }}
+                            </div>
+                            <div class="text-xs text-nyt-gray">
+                                {{ company.hq_province }}
+                            </div>
+                        </div>
+                    </td>
+                    
+                    <!-- Ticker -->
+                    <td class="px-6 py-4">
+                        <span class="font-mono text-sm text-nyt-black">
+                            {{ company.ticker }}
+                        </span>
+                    </td>
+                    
+                    <!-- Exchange -->
+                    <td class="px-6 py-4">
+                        <span class="text-sm text-nyt-gray">
+                            {{ company.exchange }}
+                        </span>
+                    </td>
+                    
+                    <!-- Sector -->
+                    <td class="px-6 py-4">
+                        <span class="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-gray-100 text-gray-800">
+                            {{ company.sector }}
+                        </span>
+                    </td>
+                    
+                    <!-- Price -->
+                    <td class="px-6 py-4 text-right">
+                        <span class="font-mono text-sm font-semibold text-nyt-black">
+                            {{ "%.2f"|format(company.last_price) }}
+                        </span>
+                    </td>
+                    
+                    <!-- Change -->
+                    <td class="px-6 py-4 text-right">
+                        {% if company.chng_1d_pct >= 0 %}
+                            <span class="inline-flex items-center px-2 py-1 rounded text-xs font-medium bg-green-100 text-green-800">
+                                ▲ {{ "%.2f"|format(company.chng_1d_pct) }}%
+                            </span>
+                        {% else %}
+                            <span class="inline-flex items-center px-2 py-1 rounded text-xs font-medium bg-red-100 text-red-800">
+                                ▼ {{ "%.2f"|format(company.chng_1d_pct|abs) }}%
+                            </span>
+                        {% endif %}
+                    </td>
+                    
+                    <!-- Details Link -->
+                    <td class="px-6 py-4 text-center">
+                        <a href="/company/{{ company.ticker }}" 
+                           class="text-nyt-accent hover:text-nyt-black transition-colors font-medium">
+                            Veure →
+                        </a>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+    
+    <!-- No Results Message -->
+    <div id="no-results" class="hidden p-8 text-center">
+        <div class="text-nyt-gray text-lg">
+            No s'han trobat empreses amb els filtres aplicats
+        </div>
+        <button 
+            id="reset-search"
+            class="mt-4 text-nyt-accent hover:underline"
+        >
+            Netejar filtres i tornar a començar
+        </button>
+    </div>
+</section>
+{% endblock %}
+
+{% block scripts %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const searchInput = document.getElementById('search');
+    const exchangeFilter = document.getElementById('exchange-filter');
+    const sectorFilter = document.getElementById('sector-filter');
+    const clearFiltersBtn = document.getElementById('clear-filters');
+    const resetSearchBtn = document.getElementById('reset-search');
+    const resultsCount = document.getElementById('results-count');
+    const noResults = document.getElementById('no-results');
+    const companyRows = document.querySelectorAll('.company-row');
+    
+    function filterCompanies() {
+        const searchTerm = searchInput.value.toLowerCase();
+        const selectedExchange = exchangeFilter.value;
+        const selectedSector = sectorFilter.value;
+        
+        let visibleCount = 0;
+        
+        companyRows.forEach(row => {
+            const name = row.getAttribute('data-name');
+            const ticker = row.getAttribute('data-ticker');
+            const exchange = row.getAttribute('data-exchange');
+            const sector = row.getAttribute('data-sector');
+            
+            const matchesSearch = !searchTerm || 
+                name.includes(searchTerm) || 
+                ticker.includes(searchTerm);
+            
+            const matchesExchange = !selectedExchange || exchange === selectedExchange;
+            const matchesSector = !selectedSector || sector === selectedSector;
+            
+            const shouldShow = matchesSearch && matchesExchange && matchesSector;
+            
+            if (shouldShow) {
+                row.style.display = '';
+                visibleCount++;
+            } else {
+                row.style.display = 'none';
+            }
+        });
+        
+        // Actualitzar comptador de resultats
+        resultsCount.textContent = `Mostrant ${visibleCount} empreses`;
+        
+        // Mostrar/ocultar missatge de "no resultats"
+        if (visibleCount === 0) {
+            noResults.classList.remove('hidden');
+        } else {
+            noResults.classList.add('hidden');
+        }
+    }
+    
+    function clearFilters() {
+        searchInput.value = '';
+        exchangeFilter.value = '';
+        sectorFilter.value = '';
+        filterCompanies();
+    }
+    
+    // Event listeners
+    searchInput.addEventListener('input', filterCompanies);
+    exchangeFilter.addEventListener('change', filterCompanies);
+    sectorFilter.addEventListener('change', filterCompanies);
+    clearFiltersBtn.addEventListener('click', clearFilters);
+    resetSearchBtn.addEventListener('click', clearFilters);
+});
+</script>
+{% endblock %}

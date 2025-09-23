@@ -1,0 +1,8 @@
+[
+  {"name":"CaixaBank","ticker":"CABK.MC","exchange":"BME","sector":"Banks","hq_province":"Barcelona"},
+  {"name":"Grifols","ticker":"GRF.MC","exchange":"BME","sector":"Healthcare","hq_province":"Barcelona"},
+  {"name":"Cellnex","ticker":"CLNX.MC","exchange":"BME","sector":"Telecom","hq_province":"Barcelona"},
+  {"name":"Fluidra","ticker":"FDR.MC","exchange":"BME","sector":"Industrials","hq_province":"Barcelona"},
+  {"name":"Inmobiliaria Colonial","ticker":"COL.MC","exchange":"BME","sector":"Real Estate","hq_province":"Barcelona"},
+  {"name":"Almirall","ticker":"ALM.MC","exchange":"BME","sector":"Pharma","hq_province":"Barcelona"}
+]

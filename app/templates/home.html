@@ -1,0 +1,161 @@
+{% extends "layout.html" %}
+
+{% block content %}
+<!-- Hero Section -->
+<section class="text-center mb-16">
+    <h1 class="text-5xl font-serif font-bold text-nyt-black mb-6 leading-tight">
+        Empreses catalanes en borsa
+    </h1>
+    <p class="text-xl text-nyt-gray max-w-2xl mx-auto leading-relaxed">
+        Seguiment d'indicadors bursàtils de les principals empreses amb seu a Catalunya
+    </p>
+</section>
+
+<!-- Featured Companies -->
+<section class="mb-16">
+    <div class="flex items-center justify-between mb-8">
+        <h2 class="text-3xl font-serif font-semibold text-nyt-black">
+            Empreses destacades
+        </h2>
+        <a href="/companies" class="text-nyt-accent hover:underline font-medium">
+            Veure totes les empreses →
+        </a>
+    </div>
+    
+    <div class="grid md:grid-cols-3 gap-8">
+        {% for company in featured_companies %}
+        <div class="bg-white border border-nyt-gray-light rounded-lg p-6 hover:shadow-lg transition-shadow">
+            <!-- Company Header -->
+            <div class="mb-4">
+                <h3 class="text-xl font-serif font-semibold text-nyt-black mb-1">
+                    {{ company.name }}
+                </h3>
+                <div class="flex items-center text-sm text-nyt-gray">
+                    <span class="font-mono">{{ company.ticker }}</span>
+                    <span class="mx-2">•</span>
+                    <span>{{ company.exchange }}</span>
+                </div>
+            </div>
+            
+            <!-- Price and Change -->
+            <div class="mb-4">
+                <div class="flex items-baseline justify-between">
+                    <span class="text-2xl font-mono font-semibold text-nyt-black">
+                        {{ "%.2f"|format(company.last_price) }}
+                    </span>
+                    <div class="flex items-center">
+                        {% if company.chng_1d_pct >= 0 %}
+                            <span class="inline-flex items-center px-2 py-1 rounded text-xs font-medium bg-green-100 text-green-800">
+                                ▲ {{ "%.2f"|format(company.chng_1d_pct) }}%
+                            </span>
+                        {% else %}
+                            <span class="inline-flex items-center px-2 py-1 rounded text-xs font-medium bg-red-100 text-red-800">
+                                ▼ {{ "%.2f"|format(company.chng_1d_pct|abs) }}%
+                            </span>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Sparkline -->
+            <div class="mb-4">
+                <div id="sparkline-{{ company.ticker }}" class="h-16"></div>
+            </div>
+            
+            <!-- Company Info -->
+            <div class="text-sm text-nyt-gray mb-4">
+                <div class="flex justify-between">
+                    <span>Sector:</span>
+                    <span>{{ company.sector }}</span>
+                </div>
+                <div class="flex justify-between">
+                    <span>Província:</span>
+                    <span>{{ company.hq_province }}</span>
+                </div>
+            </div>
+            
+            <!-- Link to Detail -->
+            <a href="/company/{{ company.ticker }}" 
+               class="inline-block w-full text-center py-2 px-4 border border-nyt-accent text-nyt-accent hover:bg-nyt-accent hover:text-white transition-colors rounded">
+                Veure detalls
+            </a>
+        </div>
+        {% endfor %}
+    </div>
+</section>
+
+<!-- Quick Stats -->
+<section class="bg-white border border-nyt-gray-light rounded-lg p-8">
+    <h2 class="text-2xl font-serif font-semibold text-nyt-black mb-6 text-center">
+        Resum del mercat
+    </h2>
+    <div class="grid md:grid-cols-3 gap-8 text-center">
+        <div>
+            <div class="text-3xl font-mono font-bold text-nyt-black mb-2">
+                {{ featured_companies|length }}
+            </div>
+            <div class="text-nyt-gray">Empreses destacades</div>
+        </div>
+        <div>
+            <div class="text-3xl font-mono font-bold text-green-600 mb-2">
+                {{ featured_companies|selectattr('chng_1d_pct', '>=', 0)|list|length }}
+            </div>
+            <div class="text-nyt-gray">En positiu avui</div>
+        </div>
+        <div>
+            <div class="text-3xl font-mono font-bold text-red-600 mb-2">
+                {{ featured_companies|selectattr('chng_1d_pct', '<', 0)|list|length }}
+            </div>
+            <div class="text-nyt-gray">En negatiu avui</div>
+        </div>
+    </div>
+</section>
+{% endblock %}
+
+{% block scripts %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Generar sparklines per cada empresa destacada
+    {% for company in featured_companies %}
+    {% if sparkline_data[company.ticker] %}
+    const sparklineData{{ loop.index }} = {{ sparkline_data[company.ticker]|tojson }};
+    
+    const sparklineTrace{{ loop.index }} = {
+        x: Array.from({length: sparklineData{{ loop.index }}.length}, (_, i) => i),
+        y: sparklineData{{ loop.index }},
+        type: 'scatter',
+        mode: 'lines',
+        line: {
+            color: '{{ "#16a34a" if company.chng_1d_pct >= 0 else "#dc2626" }}',
+            width: 2
+        },
+        hoverinfo: 'none',
+        showlegend: false
+    };
+    
+    const sparklineLayout{{ loop.index }} = {
+        margin: { t: 0, r: 0, b: 0, l: 0 },
+        paper_bgcolor: 'transparent',
+        plot_bgcolor: 'transparent',
+        xaxis: { 
+            visible: false,
+            fixedrange: true
+        },
+        yaxis: { 
+            visible: false,
+            fixedrange: true
+        },
+        hovermode: false
+    };
+    
+    const sparklineConfig{{ loop.index }} = {
+        displayModeBar: false,
+        staticPlot: true
+    };
+    
+    Plotly.newPlot('sparkline-{{ company.ticker }}', [sparklineTrace{{ loop.index }}], sparklineLayout{{ loop.index }}, sparklineConfig{{ loop.index }});
+    {% endif %}
+    {% endfor %}
+});
+</script>
+{% endblock %}

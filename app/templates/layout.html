@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html lang="ca" class="h-full">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% if title %}{{ title }} | {% endif %}Catalunya Stocks</title>
+    
+    <!-- Meta tags -->
+    <meta name="description" content="Dashboard d'empreses catalanes en borsa amb indicadors bursàtils en temps real">
+    <meta name="author" content="Catalunya Stocks">
+    
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- Plotly.js per gràfics -->
+    <script src="https://cdn.plot.ly/plotly-2.26.0.min.js"></script>
+    
+    <!-- Configuració Tailwind personalitzada -->
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        'serif': ['Georgia', 'Times', 'serif'],
+                        'sans': ['Inter', 'system-ui', 'Arial', 'sans-serif']
+                    },
+                    colors: {
+                        'nyt-black': '#111111',
+                        'nyt-gray-dark': '#444444',
+                        'nyt-gray': '#777777',
+                        'nyt-gray-light': '#e5e5e5',
+                        'nyt-bg': '#fafafa',
+                        'nyt-accent': '#0b57d0'
+                    },
+                    maxWidth: {
+                        'nyt': '1040px'
+                    }
+                }
+            }
+        }
+    </script>
+    
+    <!-- Estils personalitzats -->
+    <link rel="stylesheet" href="{{ url_for('static', path='css/main.css') }}">
+</head>
+<body class="min-h-full bg-nyt-bg text-nyt-black font-sans antialiased">
+    
+    <!-- Header -->
+    <header class="bg-white border-b border-nyt-gray-light">
+        <div class="max-w-nyt mx-auto px-6">
+            <div class="flex items-center justify-between h-16">
+                <!-- Logo/Títol -->
+                <div class="flex items-center">
+                    <a href="/" class="text-2xl font-serif font-bold text-nyt-black hover:text-nyt-accent transition-colors">
+                        Catalunya Stocks
+                    </a>
+                </div>
+                
+                <!-- Navegació -->
+                <nav class="flex space-x-8">
+                    <a href="/" class="text-nyt-gray hover:text-nyt-black transition-colors py-2 border-b-2 border-transparent hover:border-nyt-accent">
+                        Inici
+                    </a>
+                    <a href="/companies" class="text-nyt-gray hover:text-nyt-black transition-colors py-2 border-b-2 border-transparent hover:border-nyt-accent">
+                        Empreses
+                    </a>
+                </nav>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <main class="max-w-nyt mx-auto px-6 py-8">
+        {% block content %}{% endblock %}
+    </main>
+
+    <!-- Footer -->
+    <footer class="bg-white border-t border-nyt-gray-light mt-16">
+        <div class="max-w-nyt mx-auto px-6 py-8">
+            <div class="text-center text-sm text-nyt-gray">
+                <p>© 2025 Catalunya Stocks. Prototip amb dades mock.</p>
+                <p class="mt-2">Disseny inspirat en The New York Times.</p>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Scripts personalitzats -->
+    <script>
+        // Funcions utilitàries globals
+        window.formatPrice = function(price) {
+            return new Intl.NumberFormat('ca-ES', {
+                minimumFractionDigits: 2,
+                maximumFractionDigits: 2
+            }).format(price);
+        };
+
+        window.formatPercentage = function(pct) {
+            return new Intl.NumberFormat('ca-ES', {
+                minimumFractionDigits: 2,
+                maximumFractionDigits: 2,
+                signDisplay: 'always'
+            }).format(pct);
+        };
+
+        window.formatVolume = function(volume) {
+            if (volume >= 1000000) {
+                return (volume / 1000000).toFixed(1) + 'M';
+            } else if (volume >= 1000) {
+                return (volume / 1000).toFixed(0) + 'K';
+            }
+            return volume.toString();
+        };
+
+        window.formatMarketCap = function(cap) {
+            if (cap >= 1000000000) {
+                return '€' + (cap / 1000000000).toFixed(1) + 'B';
+            } else if (cap >= 1000000) {
+                return '€' + (cap / 1000000).toFixed(0) + 'M';
+            }
+            return '€' + cap.toLocaleString('ca-ES');
+        };
+    </script>
+
+    {% block scripts %}{% endblock %}
+</body>
+</html>

@@ -1,0 +1,316 @@
+{% extends "layout.html" %}
+
+{% block content %}
+<!-- Company Header -->
+<section class="mb-12">
+    <div class="flex items-start justify-between">
+        <div>
+            <h1 class="text-4xl font-serif font-bold text-nyt-black mb-2">
+                {{ company.name }}
+            </h1>
+            <div class="flex items-center text-lg text-nyt-gray mb-4">
+                <span class="font-mono font-semibold">{{ company.ticker }}</span>
+                <span class="mx-3">•</span>
+                <span>{{ company.exchange }}</span>
+                <span class="mx-3">•</span>
+                <span>{{ company.sector }}</span>
+            </div>
+            <div class="text-nyt-gray">
+                Seu: {{ company.hq_province }}
+            </div>
+        </div>
+        
+        <div class="text-right">
+            <div class="text-3xl font-mono font-bold text-nyt-black mb-2">
+                {{ "%.2f"|format(company.last_price) }}
+            </div>
+            {% if company.chng_1d_pct >= 0 %}
+                <div class="inline-flex items-center px-3 py-1 rounded text-sm font-medium bg-green-100 text-green-800">
+                    ▲ {{ "%.2f"|format(company.chng_1d_pct) }}%
+                </div>
+            {% else %}
+                <div class="inline-flex items-center px-3 py-1 rounded text-sm font-medium bg-red-100 text-red-800">
+                    ▼ {{ "%.2f"|format(company.chng_1d_pct|abs) }}%
+                </div>
+            {% endif %}
+        </div>
+    </div>
+</section>
+
+<!-- Main Content Grid -->
+<div class="grid lg:grid-cols-3 gap-8">
+    
+    <!-- Chart Section -->
+    <div class="lg:col-span-2">
+        <div class="bg-white border border-nyt-gray-light rounded-lg p-6">
+            
+            <!-- Chart Controls -->
+            <div class="flex items-center justify-between mb-6">
+                <h2 class="text-xl font-serif font-semibold text-nyt-black">
+                    Evolució del preu
+                </h2>
+                
+                <div class="flex space-x-2">
+                    <button class="range-btn px-3 py-1 text-sm border border-nyt-gray-light rounded hover:bg-nyt-bg transition-colors" 
+                            data-range="1M" aria-label="1 mes">
+                        1M
+                    </button>
+                    <button class="range-btn px-3 py-1 text-sm border border-nyt-gray-light rounded hover:bg-nyt-bg transition-colors" 
+                            data-range="3M" aria-label="3 mesos">
+                        3M
+                    </button>
+                    <button class="range-btn px-3 py-1 text-sm border border-nyt-gray-light rounded hover:bg-nyt-bg transition-colors bg-nyt-accent text-white" 
+                            data-range="1Y" aria-label="1 any">
+                        1A
+                    </button>
+                </div>
+            </div>
+            
+            <!-- Price Chart -->
+            <div id="price-chart" class="h-96 mb-6"></div>
+            
+            <!-- Volume Chart -->
+            <div class="border-t border-nyt-gray-light pt-4">
+                <h3 class="text-lg font-serif font-semibold text-nyt-black mb-4">
+                    Volum
+                </h3>
+                <div id="volume-chart" class="h-32"></div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- KPI Sidebar -->
+    <div class="space-y-6">
+        
+        <!-- Key Metrics -->
+        <div class="bg-white border border-nyt-gray-light rounded-lg p-6">
+            <h3 class="text-lg font-serif font-semibold text-nyt-black mb-4">
+                Indicadors clau
+            </h3>
+            
+            <div class="space-y-4">
+                <div class="flex justify-between items-center">
+                    <span class="text-sm text-nyt-gray">Preu actual</span>
+                    <span class="font-mono font-semibold text-nyt-black">
+                        {{ "%.2f"|format(company.last_price) }}
+                    </span>
+                </div>
+                
+                <div class="flex justify-between items-center">
+                    <span class="text-sm text-nyt-gray">Màxim 52s</span>
+                    <span class="font-mono text-nyt-black">
+                        {{ "%.2f"|format(company.high_52w) }}
+                    </span>
+                </div>
+                
+                <div class="flex justify-between items-center">
+                    <span class="text-sm text-nyt-gray">Mínim 52s</span>
+                    <span class="font-mono text-nyt-black">
+                        {{ "%.2f"|format(company.low_52w) }}
+                    </span>
+                </div>
+                
+                <div class="border-t border-nyt-gray-light pt-4">
+                    <div class="flex justify-between items-center">
+                        <span class="text-sm text-nyt-gray">Cap. mercat</span>
+                        <span class="font-mono text-nyt-black" id="market-cap">
+                            <!-- Calculat amb JS -->
+                        </span>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Company Info -->
+        <div class="bg-white border border-nyt-gray-light rounded-lg p-6">
+            <h3 class="text-lg font-serif font-semibold text-nyt-black mb-4">
+                Informació de l'empresa
+            </h3>
+            
+            <div class="space-y-3">
+                <div>
+                    <span class="text-sm text-nyt-gray block">Nom complet</span>
+                    <span class="text-sm font-medium text-nyt-black">{{ company.name }}</span>
+                </div>
+                
+                <div>
+                    <span class="text-sm text-nyt-gray block">Ticker</span>
+                    <span class="text-sm font-mono font-medium text-nyt-black">{{ company.ticker }}</span>
+                </div>
+                
+                <div>
+                    <span class="text-sm text-nyt-gray block">Borsa</span>
+                    <span class="text-sm font-medium text-nyt-black">{{ company.exchange }}</span>
+                </div>
+                
+                <div>
+                    <span class="text-sm text-nyt-gray block">Sector</span>
+                    <span class="text-sm font-medium text-nyt-black">{{ company.sector }}</span>
+                </div>
+                
+                <div>
+                    <span class="text-sm text-nyt-gray block">Província</span>
+                    <span class="text-sm font-medium text-nyt-black">{{ company.hq_province }}</span>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Navigation -->
+        <div class="bg-white border border-nyt-gray-light rounded-lg p-6">
+            <h3 class="text-lg font-serif font-semibold text-nyt-black mb-4">
+                Navegació
+            </h3>
+            
+            <div class="space-y-2">
+                <a href="/companies" class="block text-nyt-accent hover:underline text-sm">
+                    ← Tornar a totes les empreses
+                </a>
+                <a href="/" class="block text-nyt-accent hover:underline text-sm">
+                    ← Anar a l'inici
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const ticker = '{{ company.ticker }}';
+    let currentRange = '1Y';
+    let priceData = {{ prices|tojson }};
+    
+    // Format market cap
+    const marketCap = {{ company.mkt_cap }};
+    document.getElementById('market-cap').textContent = formatMarketCap(marketCap);
+    
+    function updateCharts(data) {
+        // Preparar dades per Plotly
+        const dates = data.map(d => d.date);
+        const closes = data.map(d => d.close);
+        const volumes = data.map(d => d.volume);
+        
+        // Price Chart
+        const priceTrace = {
+            x: dates,
+            y: closes,
+            type: 'scatter',
+            mode: 'lines',
+            name: 'Preu de tancament',
+            line: {
+                color: '#0b57d0',
+                width: 2
+            },
+            hovertemplate: 'Data: %{x}<br>Preu: %{y:.2f}<extra></extra>'
+        };
+        
+        const priceLayout = {
+            margin: { t: 20, r: 20, b: 40, l: 60 },
+            paper_bgcolor: 'white',
+            plot_bgcolor: 'white',
+            font: { family: 'Inter, system-ui, Arial', size: 12 },
+            xaxis: {
+                showgrid: true,
+                gridcolor: '#e5e5e5',
+                gridwidth: 1,
+                tickformat: '%d/%m',
+                showline: true,
+                linecolor: '#e5e5e5'
+            },
+            yaxis: {
+                showgrid: true,
+                gridcolor: '#e5e5e5',
+                gridwidth: 1,
+                showline: true,
+                linecolor: '#e5e5e5',
+                tickformat: '.2f'
+            },
+            hovermode: 'x unified'
+        };
+        
+        const chartConfig = {
+            displayModeBar: false,
+            responsive: true
+        };
+        
+        Plotly.newPlot('price-chart', [priceTrace], priceLayout, chartConfig);
+        
+        // Volume Chart
+        const volumeTrace = {
+            x: dates,
+            y: volumes,
+            type: 'bar',
+            name: 'Volum',
+            marker: {
+                color: '#777777',
+                opacity: 0.7
+            },
+            hovertemplate: 'Data: %{x}<br>Volum: %{y:,}<extra></extra>'
+        };
+        
+        const volumeLayout = {
+            margin: { t: 10, r: 20, b: 40, l: 60 },
+            paper_bgcolor: 'white',
+            plot_bgcolor: 'white',
+            font: { family: 'Inter, system-ui, Arial', size: 12 },
+            xaxis: {
+                showgrid: false,
+                tickformat: '%d/%m',
+                showline: true,
+                linecolor: '#e5e5e5'
+            },
+            yaxis: {
+                showgrid: true,
+                gridcolor: '#e5e5e5',
+                gridwidth: 1,
+                showline: true,
+                linecolor: '#e5e5e5',
+                tickformat: '.0s'
+            },
+            bargap: 0.1
+        };
+        
+        Plotly.newPlot('volume-chart', [volumeTrace], volumeLayout, chartConfig);
+    }
+    
+    function loadData(range) {
+        // Mostrar loading state
+        document.getElementById('price-chart').innerHTML = '<div class="flex items-center justify-center h-full text-nyt-gray">Carregant...</div>';
+        
+        fetch(`/api/companies/${ticker}/series?range=${range}`)
+            .then(response => response.json())
+            .then(data => {
+                priceData = data.prices;
+                updateCharts(priceData);
+            })
+            .catch(error => {
+                console.error('Error carregant dades:', error);
+                document.getElementById('price-chart').innerHTML = '<div class="flex items-center justify-center h-full text-red-600">Error carregant dades</div>';
+            });
+    }
+    
+    // Event listeners per botons de rang
+    document.querySelectorAll('.range-btn').forEach(btn => {
+        btn.addEventListener('click', function() {
+            const range = this.getAttribute('data-range');
+            
+            // Actualitzar botons actius
+            document.querySelectorAll('.range-btn').forEach(b => {
+                b.classList.remove('bg-nyt-accent', 'text-white');
+                b.classList.add('border-nyt-gray-light');
+            });
+            
+            this.classList.add('bg-nyt-accent', 'text-white');
+            this.classList.remove('border-nyt-gray-light');
+            
+            currentRange = range;
+            loadData(range);
+        });
+    });
+    
+    // Inicialitzar gràfics amb dades 1Y
+    updateCharts(priceData);
+});
+</script>
+{% endblock %}
