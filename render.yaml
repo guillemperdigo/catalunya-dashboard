@@ -1,0 +1,10 @@
+services:
+  - type: web
+    name: catalunya-dashboard
+    env: python
+    buildCommand: "pip install -r requirements.txt && python scripts/gen_mock_data.py"
+    startCommand: "./start.sh"
+    plan: free
+    envVars:
+      - key: PYTHON_VERSION
+        value: 3.8.10
