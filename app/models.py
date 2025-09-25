@@ -109,3 +109,47 @@ class HousingOverview(BaseModel):
     rent_change_1y: float
     new_units_built: int
     mortgage_volume: float
+
+
+# Models per Medi Ambient
+class AirQualityData(BaseModel):
+    city: str
+    date: str
+    pm25: float  # µg/m³
+    pm10: float  # µg/m³
+    no2: float   # µg/m³
+    o3: float    # µg/m³
+    aqi: int     # Air Quality Index (0-500)
+    quality_level: str  # "Bo", "Moderat", "Dolent", "Molt dolent"
+
+
+class EnergyData(BaseModel):
+    region: str
+    year: int
+    total_consumption_gwh: float
+    renewable_percentage: float
+    solar_capacity_mw: float
+    wind_capacity_mw: float
+    hydro_capacity_mw: float
+    co2_emissions_tons: float
+
+
+class WasteData(BaseModel):
+    region: str
+    year: int
+    total_waste_tons: int
+    recycling_rate: float  # %
+    organic_waste_tons: int
+    plastic_waste_tons: int
+    paper_waste_tons: int
+    glass_waste_tons: int
+    waste_per_capita_kg: float
+
+
+class EnvironmentOverview(BaseModel):
+    avg_aqi: float
+    renewable_percentage: float
+    recycling_rate: float
+    co2_reduction_1y: float
+    green_energy_capacity_mw: float
+    waste_per_capita: float

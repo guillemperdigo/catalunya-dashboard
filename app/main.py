@@ -159,6 +159,30 @@ async def housing_page(request: Request):
         raise HTTPException(status_code=500, detail=f"Error carregant habitatge: {str(e)}")
 
 
+@app.get("/environment", response_class=HTMLResponse)
+async def environment_page(request: Request):
+    """Pàgina de medi ambient"""
+    try:
+        # Carregar dades de medi ambient
+        environment_path = os.path.join("data", "environment.json")
+        with open(environment_path, 'r', encoding='utf-8') as f:
+            data = json.load(f)
+        
+        return templates.TemplateResponse("environment.html", {
+            "request": request,
+            "overview": data["overview"],
+            "air_quality": data["air_quality"],
+            "energy": data["energy"],
+            "waste": data["waste"],
+            "renewable_evolution": data["renewable_evolution"],
+            "co2_emissions_evolution": data["co2_emissions_evolution"],
+            "title": "Medi Ambient a Catalunya"
+        })
+    
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Error carregant medi ambient: {str(e)}")
+
+
 # Endpoint de salut
 @app.get("/health")
 async def health_check():

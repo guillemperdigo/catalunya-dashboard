@@ -1,0 +1,412 @@
+{% extends "layout.html" %}
+
+{% block content %}
+<!-- Page Header -->
+<section class="mb-12">
+    <h1 class="text-4xl font-serif font-bold text-nyt-black mb-4">
+        Medi Ambient a Catalunya
+    </h1>
+    <p class="text-lg text-nyt-gray">
+        Qualitat de l'aire, energia renovable i gestió de residus
+    </p>
+</section>
+
+<!-- Overview Cards -->
+<section class="grid md:grid-cols-6 gap-6 mb-12">
+    <div class="bg-white border border-nyt-gray-light rounded-lg p-6 text-center">
+        <div class="text-3xl font-mono font-bold {{ 'text-green-600' if overview.avg_aqi <= 50 else 'text-orange-600' if overview.avg_aqi <= 100 else 'text-red-600' }} mb-2">
+            {{ overview.avg_aqi|int }}
+        </div>
+        <div class="text-sm text-nyt-gray">IQA mitjà</div>
+    </div>
+    
+    <div class="bg-white border border-nyt-gray-light rounded-lg p-6 text-center">
+        <div class="text-3xl font-mono font-bold text-green-600 mb-2">
+            {{ "%.1f"|format(overview.renewable_percentage) }}%
+        </div>
+        <div class="text-sm text-nyt-gray">Energia renovable</div>
+    </div>
+    
+    <div class="bg-white border border-nyt-gray-light rounded-lg p-6 text-center">
+        <div class="text-3xl font-mono font-bold {{ 'text-green-600' if overview.recycling_rate >= 40 else 'text-orange-600' if overview.recycling_rate >= 30 else 'text-red-600' }} mb-2">
+            {{ "%.1f"|format(overview.recycling_rate) }}%
+        </div>
+        <div class="text-sm text-nyt-gray">Taxa reciclatge</div>
+    </div>
+    
+    <div class="bg-white border border-nyt-gray-light rounded-lg p-6 text-center">
+        <div class="text-3xl font-mono font-bold text-green-600 mb-2">
+            {{ "%.1f"|format(overview.co2_reduction_1y|abs) }}%
+        </div>
+        <div class="text-sm text-nyt-gray">Reducció CO₂</div>
+    </div>
+    
+    <div class="bg-white border border-nyt-gray-light rounded-lg p-6 text-center">
+        <div class="text-3xl font-mono font-bold text-nyt-black mb-2">
+            {{ "{:,}".format(overview.green_energy_capacity_mw|int).replace(",", ".") }}
+        </div>
+        <div class="text-sm text-nyt-gray">MW renovables</div>
+    </div>
+    
+    <div class="bg-white border border-nyt-gray-light rounded-lg p-6 text-center">
+        <div class="text-3xl font-mono font-bold text-nyt-black mb-2">
+            {{ overview.waste_per_capita|int }}
+        </div>
+        <div class="text-sm text-nyt-gray">kg residus/hab</div>
+    </div>
+</section>
+
+<!-- Main Content Grid -->
+<div class="grid lg:grid-cols-3 gap-8">
+    
+    <!-- Charts Section -->
+    <div class="lg:col-span-2 space-y-6">
+        
+        <!-- Air Quality Chart -->
+        <div class="bg-white border border-nyt-gray-light rounded-lg p-6">
+            <h2 class="text-xl font-serif font-semibold text-nyt-black mb-6">
+                Qualitat de l'aire per ciutats (IQA)
+            </h2>
+            <div id="air-quality-chart" class="h-80"></div>
+        </div>
+        
+        <!-- Energy Mix Chart -->
+        <div class="bg-white border border-nyt-gray-light rounded-lg p-6">
+            <h2 class="text-xl font-serif font-semibold text-nyt-black mb-6">
+                Mix energètic per províncies
+            </h2>
+            <div id="energy-mix-chart" class="h-80"></div>
+        </div>
+        
+        <!-- Historical Evolution -->
+        <div class="bg-white border border-nyt-gray-light rounded-lg p-6">
+            <h2 class="text-xl font-serif font-semibold text-nyt-black mb-6">
+                Evolució energia renovable i emissions CO₂
+            </h2>
+            <div id="evolution-chart" class="h-80"></div>
+        </div>
+    </div>
+    
+    <!-- Sidebar -->
+    <div class="space-y-6">
+        
+        <!-- Air Quality Status -->
+        <div class="bg-white border border-nyt-gray-light rounded-lg p-6">
+            <h3 class="text-lg font-serif font-semibold text-nyt-black mb-4">
+                Estat qualitat aire
+            </h3>
+            <div class="space-y-3">
+                {% for city in air_quality[:6] %}
+                <div class="flex items-center justify-between">
+                    <span class="text-sm text-nyt-gray">{{ city.city }}</span>
+                    <div class="flex items-center">
+                        <div class="w-16 h-4 {{ 'bg-green-500' if city.aqi <= 50 else 'bg-yellow-500' if city.aqi <= 100 else 'bg-orange-500' if city.aqi <= 150 else 'bg-red-500' }} rounded mr-2"></div>
+                        <span class="text-xs font-mono text-nyt-black">{{ city.aqi }}</span>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+            <div class="mt-4 text-xs text-nyt-gray">
+                <div class="flex items-center space-x-4">
+                    <div class="flex items-center">
+                        <div class="w-3 h-3 bg-green-500 rounded mr-1"></div>
+                        <span>Bo (≤50)</span>
+                    </div>
+                    <div class="flex items-center">
+                        <div class="w-3 h-3 bg-yellow-500 rounded mr-1"></div>
+                        <span>Moderat (51-100)</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Renewable Energy Capacity -->
+        <div class="bg-white border border-nyt-gray-light rounded-lg p-6">
+            <h3 class="text-lg font-serif font-semibold text-nyt-black mb-4">
+                Capacitat renovable
+            </h3>
+            <div id="renewable-capacity-chart" class="h-48"></div>
+        </div>
+        
+        <!-- Recycling Rates -->
+        <div class="bg-white border border-nyt-gray-light rounded-lg p-6">
+            <h3 class="text-lg font-serif font-semibold text-nyt-black mb-4">
+                Taxa de reciclatge
+            </h3>
+            <div class="space-y-3">
+                {% for region in waste[:5] %}
+                <div class="flex items-center justify-between">
+                    <span class="text-sm text-nyt-gray">{{ region.region }}</span>
+                    <div class="flex items-center">
+                        <div class="w-20 bg-gray-200 rounded-full h-2 mr-2">
+                            <div class="bg-{{ 'green' if region.recycling_rate >= 40 else 'orange' if region.recycling_rate >= 30 else 'red' }}-500 h-2 rounded-full" 
+                                 style="width: {{ (region.recycling_rate / 50 * 100)|round }}%"></div>
+                        </div>
+                        <span class="text-xs font-mono text-nyt-black">{{ "%.1f"|format(region.recycling_rate) }}%</span>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+        
+        <!-- Waste Composition -->
+        <div class="bg-white border border-nyt-gray-light rounded-lg p-6">
+            <h3 class="text-lg font-serif font-semibold text-nyt-black mb-4">
+                Composició residus
+            </h3>
+            <div id="waste-composition-chart" class="h-48"></div>
+        </div>
+    </div>
+</div>
+
+<!-- Detailed Tables -->
+<section class="mt-12 space-y-8">
+    
+    <!-- Air Quality Table -->
+    <div class="bg-white border border-nyt-gray-light rounded-lg overflow-hidden">
+        <div class="px-6 py-4 border-b border-nyt-gray-light">
+            <h2 class="text-xl font-serif font-semibold text-nyt-black">
+                Qualitat de l'aire per ciutats
+            </h2>
+        </div>
+        
+        <div class="overflow-x-auto">
+            <table class="w-full">
+                <thead class="bg-nyt-bg border-b border-nyt-gray-light">
+                    <tr>
+                        <th class="px-6 py-4 text-left text-sm font-semibold text-nyt-black">Ciutat</th>
+                        <th class="px-6 py-4 text-right text-sm font-semibold text-nyt-black">IQA</th>
+                        <th class="px-6 py-4 text-right text-sm font-semibold text-nyt-black">PM2.5</th>
+                        <th class="px-6 py-4 text-right text-sm font-semibold text-nyt-black">PM10</th>
+                        <th class="px-6 py-4 text-right text-sm font-semibold text-nyt-black">NO₂</th>
+                        <th class="px-6 py-4 text-center text-sm font-semibold text-nyt-black">Nivell</th>
+                    </tr>
+                </thead>
+                <tbody class="divide-y divide-nyt-gray-light">
+                    {% for city in air_quality %}
+                    <tr class="hover:bg-nyt-bg transition-colors">
+                        <td class="px-6 py-4">
+                            <span class="text-sm font-semibold text-nyt-black">{{ city.city }}</span>
+                        </td>
+                        <td class="px-6 py-4 text-right">
+                            <span class="font-mono text-sm {{ 'text-green-600' if city.aqi <= 50 else 'text-orange-600' if city.aqi <= 100 else 'text-red-600' }}">
+                                {{ city.aqi }}
+                            </span>
+                        </td>
+                        <td class="px-6 py-4 text-right">
+                            <span class="font-mono text-sm text-nyt-black">{{ "%.1f"|format(city.pm25) }}</span>
+                        </td>
+                        <td class="px-6 py-4 text-right">
+                            <span class="font-mono text-sm text-nyt-black">{{ "%.1f"|format(city.pm10) }}</span>
+                        </td>
+                        <td class="px-6 py-4 text-right">
+                            <span class="font-mono text-sm text-nyt-black">{{ "%.1f"|format(city.no2) }}</span>
+                        </td>
+                        <td class="px-6 py-4 text-center">
+                            <span class="inline-flex items-center px-2 py-1 rounded text-xs font-medium {{ 'bg-green-100 text-green-800' if city.quality_level == 'Bo' else 'bg-yellow-100 text-yellow-800' if city.quality_level == 'Moderat' else 'bg-red-100 text-red-800' }}">
+                                {{ city.quality_level }}
+                            </span>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+    
+    <!-- Energy Table -->
+    <div class="bg-white border border-nyt-gray-light rounded-lg overflow-hidden">
+        <div class="px-6 py-4 border-b border-nyt-gray-light">
+            <h2 class="text-xl font-serif font-semibold text-nyt-black">
+                Energia per províncies
+            </h2>
+        </div>
+        
+        <div class="overflow-x-auto">
+            <table class="w-full">
+                <thead class="bg-nyt-bg border-b border-nyt-gray-light">
+                    <tr>
+                        <th class="px-6 py-4 text-left text-sm font-semibold text-nyt-black">Província</th>
+                        <th class="px-6 py-4 text-right text-sm font-semibold text-nyt-black">Consum GWh</th>
+                        <th class="px-6 py-4 text-right text-sm font-semibold text-nyt-black">% Renovable</th>
+                        <th class="px-6 py-4 text-right text-sm font-semibold text-nyt-black">Solar MW</th>
+                        <th class="px-6 py-4 text-right text-sm font-semibold text-nyt-black">Eòlica MW</th>
+                        <th class="px-6 py-4 text-right text-sm font-semibold text-nyt-black">Hidràulica MW</th>
+                    </tr>
+                </thead>
+                <tbody class="divide-y divide-nyt-gray-light">
+                    {% for region in energy %}
+                    <tr class="hover:bg-nyt-bg transition-colors">
+                        <td class="px-6 py-4">
+                            <span class="text-sm font-semibold text-nyt-black">{{ region.region }}</span>
+                        </td>
+                        <td class="px-6 py-4 text-right">
+                            <span class="font-mono text-sm text-nyt-black">
+                                {{ "{:,}".format(region.total_consumption_gwh|int).replace(",", ".") }}
+                            </span>
+                        </td>
+                        <td class="px-6 py-4 text-right">
+                            <span class="font-mono text-sm {{ 'text-green-600' if region.renewable_percentage >= 50 else 'text-orange-600' if region.renewable_percentage >= 30 else 'text-red-600' }}">
+                                {{ "%.1f"|format(region.renewable_percentage) }}%
+                            </span>
+                        </td>
+                        <td class="px-6 py-4 text-right">
+                            <span class="font-mono text-sm text-nyt-gray">{{ region.solar_capacity_mw|int }}</span>
+                        </td>
+                        <td class="px-6 py-4 text-right">
+                            <span class="font-mono text-sm text-nyt-gray">{{ region.wind_capacity_mw|int }}</span>
+                        </td>
+                        <td class="px-6 py-4 text-right">
+                            <span class="font-mono text-sm text-nyt-gray">{{ region.hydro_capacity_mw|int }}</span>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</section>
+{% endblock %}
+
+{% block scripts %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const airQualityData = {{ air_quality|tojson }};
+    const energyData = {{ energy|tojson }};
+    const wasteData = {{ waste|tojson }};
+    const renewableEvolution = {{ renewable_evolution|tojson }};
+    const co2Evolution = {{ co2_emissions_evolution|tojson }};
+    
+    const chartConfig = {displayModeBar: false, responsive: true};
+    
+    // Air Quality Chart
+    const airQualityTrace = {
+        x: airQualityData.map(c => c.city),
+        y: airQualityData.map(c => c.aqi),
+        type: 'bar',
+        marker: {
+            color: airQualityData.map(c => c.aqi <= 50 ? '#16a34a' : c.aqi <= 100 ? '#eab308' : '#dc2626'),
+            opacity: 0.8
+        },
+        hovertemplate: '%{x}<br>IQA: %{y}<br>%{text}<extra></extra>',
+        text: airQualityData.map(c => c.quality_level)
+    };
+    
+    const airQualityLayout = {
+        margin: { t: 20, r: 20, b: 60, l: 60 },
+        paper_bgcolor: 'white',
+        plot_bgcolor: 'white',
+        font: { family: 'Inter, system-ui, Arial', size: 12 },
+        xaxis: { showgrid: false, showline: true, linecolor: '#e5e5e5' },
+        yaxis: { showgrid: true, gridcolor: '#e5e5e5', title: 'Índex Qualitat Aire (IQA)' }
+    };
+    
+    Plotly.newPlot('air-quality-chart', [airQualityTrace], airQualityLayout, chartConfig);
+    
+    // Energy Mix Chart
+    const energyMixTrace = {
+        x: energyData.map(r => r.region),
+        y: energyData.map(r => r.renewable_percentage),
+        type: 'bar',
+        marker: {
+            color: energyData.map(r => r.renewable_percentage >= 50 ? '#16a34a' : '#eab308'),
+            opacity: 0.8
+        },
+        hovertemplate: '%{x}<br>Renovable: %{y:.1f}%<extra></extra>'
+    };
+    
+    const energyMixLayout = {
+        margin: { t: 20, r: 20, b: 60, l: 60 },
+        paper_bgcolor: 'white',
+        plot_bgcolor: 'white',
+        font: { family: 'Inter, system-ui, Arial', size: 12 },
+        xaxis: { showgrid: false, showline: true, linecolor: '#e5e5e5' },
+        yaxis: { showgrid: true, gridcolor: '#e5e5e5', title: '% Energia Renovable', range: [0, 100] }
+    };
+    
+    Plotly.newPlot('energy-mix-chart', [energyMixTrace], energyMixLayout, chartConfig);
+    
+    // Evolution Chart
+    const evolutionTraces = [
+        {
+            x: renewableEvolution.map(d => d.year),
+            y: renewableEvolution.map(d => d.renewable_percentage),
+            type: 'scatter',
+            mode: 'lines+markers',
+            name: '% Renovable',
+            line: {color: '#16a34a', width: 3},
+            yaxis: 'y'
+        },
+        {
+            x: co2Evolution.map(d => d.year),
+            y: co2Evolution.map(d => d.emissions_tons / 1000000),
+            type: 'scatter',
+            mode: 'lines+markers',
+            name: 'Emissions CO₂ (Mt)',
+            line: {color: '#dc2626', width: 3},
+            yaxis: 'y2'
+        }
+    ];
+    
+    const evolutionLayout = {
+        margin: { t: 20, r: 80, b: 40, l: 80 },
+        paper_bgcolor: 'white',
+        plot_bgcolor: 'white',
+        font: { family: 'Inter, system-ui, Arial', size: 12 },
+        xaxis: { showgrid: true, gridcolor: '#e5e5e5' },
+        yaxis: { title: '% Energia Renovable', showgrid: true, gridcolor: '#e5e5e5', side: 'left' },
+        yaxis2: { title: 'Emissions CO₂ (Mt)', overlaying: 'y', side: 'right', showgrid: false },
+        legend: { x: 0.02, y: 0.98 }
+    };
+    
+    Plotly.newPlot('evolution-chart', evolutionTraces, evolutionLayout, chartConfig);
+    
+    // Renewable Capacity Chart (Pie)
+    const totalCapacity = energyData[0];
+    const capacityTrace = {
+        values: [totalCapacity.solar_capacity_mw, totalCapacity.wind_capacity_mw, totalCapacity.hydro_capacity_mw],
+        labels: ['Solar', 'Eòlica', 'Hidràulica'],
+        type: 'pie',
+        marker: {
+            colors: ['#f59e0b', '#06b6d4', '#3b82f6']
+        },
+        textinfo: 'label+percent',
+        textposition: 'outside',
+        hovertemplate: '%{label}<br>%{value} MW<br>%{percent}<extra></extra>'
+    };
+    
+    const capacityLayout = {
+        margin: { t: 20, r: 20, b: 20, l: 20 },
+        paper_bgcolor: 'white',
+        font: { family: 'Inter, system-ui, Arial', size: 11 },
+        showlegend: false
+    };
+    
+    Plotly.newPlot('renewable-capacity-chart', [capacityTrace], capacityLayout, chartConfig);
+    
+    // Waste Composition Chart (example with Barcelona data)
+    const barcelonaWaste = wasteData[0];
+    const wasteTrace = {
+        values: [barcelonaWaste.organic_waste_tons, barcelonaWaste.plastic_waste_tons, 
+                barcelonaWaste.paper_waste_tons, barcelonaWaste.glass_waste_tons],
+        labels: ['Orgànic', 'Plàstic', 'Paper', 'Vidre'],
+        type: 'pie',
+        marker: {
+            colors: ['#16a34a', '#f59e0b', '#8b5cf6', '#06b6d4']
+        },
+        textinfo: 'label+percent',
+        textposition: 'outside',
+        hovertemplate: '%{label}<br>%{value:,} t<br>%{percent}<extra></extra>'
+    };
+    
+    const wasteLayout = {
+        margin: { t: 20, r: 20, b: 20, l: 20 },
+        paper_bgcolor: 'white',
+        font: { family: 'Inter, system-ui, Arial', size: 10 },
+        showlegend: false
+    };
+    
+    Plotly.newPlot('waste-composition-chart', [wasteTrace], wasteLayout, chartConfig);
+});
+</script>
+{% endblock %}

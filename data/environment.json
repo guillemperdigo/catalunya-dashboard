@@ -1,0 +1,248 @@
+{
+  "overview": {
+    "avg_aqi": 42.5,
+    "renewable_percentage": 52.8,
+    "recycling_rate": 38.2,
+    "co2_reduction_1y": -8.5,
+    "green_energy_capacity_mw": 8450.0,
+    "waste_per_capita": 465.0
+  },
+  "air_quality": [
+    {
+      "city": "Barcelona",
+      "date": "2024-09-23",
+      "pm25": 18.5,
+      "pm10": 28.2,
+      "no2": 35.8,
+      "o3": 42.1,
+      "aqi": 48,
+      "quality_level": "Moderat"
+    },
+    {
+      "city": "Girona",
+      "date": "2024-09-23",
+      "pm25": 12.3,
+      "pm10": 22.1,
+      "no2": 28.4,
+      "o3": 38.9,
+      "aqi": 35,
+      "quality_level": "Bo"
+    },
+    {
+      "city": "Lleida",
+      "date": "2024-09-23",
+      "pm25": 15.8,
+      "pm10": 25.6,
+      "no2": 31.2,
+      "o3": 45.3,
+      "aqi": 41,
+      "quality_level": "Bo"
+    },
+    {
+      "city": "Tarragona",
+      "date": "2024-09-23",
+      "pm25": 16.9,
+      "pm10": 26.8,
+      "no2": 33.1,
+      "o3": 41.7,
+      "aqi": 44,
+      "quality_level": "Bo"
+    },
+    {
+      "city": "Sabadell",
+      "date": "2024-09-23",
+      "pm25": 19.2,
+      "pm10": 29.5,
+      "no2": 36.9,
+      "o3": 43.2,
+      "aqi": 49,
+      "quality_level": "Moderat"
+    },
+    {
+      "city": "Terrassa",
+      "date": "2024-09-23",
+      "pm25": 17.6,
+      "pm10": 27.8,
+      "no2": 34.5,
+      "o3": 40.8,
+      "aqi": 46,
+      "quality_level": "Bo"
+    },
+    {
+      "city": "Badalona",
+      "date": "2024-09-23",
+      "pm25": 20.1,
+      "pm10": 30.8,
+      "no2": 38.2,
+      "o3": 44.6,
+      "aqi": 52,
+      "quality_level": "Moderat"
+    },
+    {
+      "city": "Manresa",
+      "date": "2024-09-23",
+      "pm25": 14.2,
+      "pm10": 23.9,
+      "no2": 29.7,
+      "o3": 39.4,
+      "aqi": 38,
+      "quality_level": "Bo"
+    }
+  ],
+  "energy": [
+    {
+      "region": "Catalunya",
+      "year": 2024,
+      "total_consumption_gwh": 52800.0,
+      "renewable_percentage": 52.8,
+      "solar_capacity_mw": 3200.0,
+      "wind_capacity_mw": 1850.0,
+      "hydro_capacity_mw": 3400.0,
+      "co2_emissions_tons": 18500000.0
+    },
+    {
+      "region": "Barcelona",
+      "year": 2024,
+      "total_consumption_gwh": 28500.0,
+      "renewable_percentage": 48.2,
+      "solar_capacity_mw": 1850.0,
+      "wind_capacity_mw": 450.0,
+      "hydro_capacity_mw": 1200.0,
+      "co2_emissions_tons": 11200000.0
+    },
+    {
+      "region": "Tarragona",
+      "year": 2024,
+      "total_consumption_gwh": 12800.0,
+      "renewable_percentage": 58.9,
+      "solar_capacity_mw": 680.0,
+      "wind_capacity_mw": 920.0,
+      "hydro_capacity_mw": 850.0,
+      "co2_emissions_tons": 4100000.0
+    },
+    {
+      "region": "Girona",
+      "year": 2024,
+      "total_consumption_gwh": 7200.0,
+      "renewable_percentage": 62.1,
+      "solar_capacity_mw": 420.0,
+      "wind_capacity_mw": 380.0,
+      "hydro_capacity_mw": 980.0,
+      "co2_emissions_tons": 2100000.0
+    },
+    {
+      "region": "Lleida",
+      "year": 2024,
+      "total_consumption_gwh": 4300.0,
+      "renewable_percentage": 68.4,
+      "solar_capacity_mw": 250.0,
+      "wind_capacity_mw": 100.0,
+      "hydro_capacity_mw": 370.0,
+      "co2_emissions_tons": 1100000.0
+    }
+  ],
+  "waste": [
+    {
+      "region": "Barcelona ciutat",
+      "year": 2024,
+      "total_waste_tons": 850000,
+      "recycling_rate": 35.8,
+      "organic_waste_tons": 280000,
+      "plastic_waste_tons": 95000,
+      "paper_waste_tons": 120000,
+      "glass_waste_tons": 45000,
+      "waste_per_capita_kg": 520.0
+    },
+    {
+      "region": "Barcelonès",
+      "year": 2024,
+      "total_waste_tons": 1200000,
+      "recycling_rate": 38.2,
+      "organic_waste_tons": 420000,
+      "plastic_waste_tons": 135000,
+      "paper_waste_tons": 165000,
+      "glass_waste_tons": 62000,
+      "waste_per_capita_kg": 485.0
+    },
+    {
+      "region": "Vallès Occidental",
+      "year": 2024,
+      "total_waste_tons": 480000,
+      "recycling_rate": 42.1,
+      "organic_waste_tons": 165000,
+      "plastic_waste_tons": 58000,
+      "paper_waste_tons": 72000,
+      "glass_waste_tons": 28000,
+      "waste_per_capita_kg": 445.0
+    },
+    {
+      "region": "Baix Llobregat",
+      "year": 2024,
+      "total_waste_tons": 420000,
+      "recycling_rate": 40.5,
+      "organic_waste_tons": 145000,
+      "plastic_waste_tons": 48000,
+      "paper_waste_tons": 58000,
+      "glass_waste_tons": 22000,
+      "waste_per_capita_kg": 465.0
+    },
+    {
+      "region": "Vallès Oriental",
+      "year": 2024,
+      "total_waste_tons": 210000,
+      "recycling_rate": 45.2,
+      "organic_waste_tons": 75000,
+      "plastic_waste_tons": 25000,
+      "paper_waste_tons": 32000,
+      "glass_waste_tons": 12000,
+      "waste_per_capita_kg": 425.0
+    },
+    {
+      "region": "Maresme",
+      "year": 2024,
+      "total_waste_tons": 230000,
+      "recycling_rate": 39.8,
+      "organic_waste_tons": 82000,
+      "plastic_waste_tons": 28000,
+      "paper_waste_tons": 34000,
+      "glass_waste_tons": 13000,
+      "waste_per_capita_kg": 475.0
+    },
+    {
+      "region": "Tarragonès",
+      "year": 2024,
+      "total_waste_tons": 135000,
+      "recycling_rate": 37.2,
+      "organic_waste_tons": 48000,
+      "plastic_waste_tons": 16000,
+      "paper_waste_tons": 20000,
+      "glass_waste_tons": 8000,
+      "waste_per_capita_kg": 455.0
+    },
+    {
+      "region": "Gironès",
+      "year": 2024,
+      "total_waste_tons": 95000,
+      "recycling_rate": 41.8,
+      "organic_waste_tons": 34000,
+      "plastic_waste_tons": 11000,
+      "paper_waste_tons": 14000,
+      "glass_waste_tons": 6000,
+      "waste_per_capita_kg": 440.0
+    }
+  ],
+  "renewable_evolution": [
+    {"year": 2020, "renewable_percentage": 42.1, "capacity_mw": 6850},
+    {"year": 2021, "renewable_percentage": 45.8, "capacity_mw": 7280},
+    {"year": 2022, "renewable_percentage": 48.5, "capacity_mw": 7650},
+    {"year": 2023, "renewable_percentage": 50.9, "capacity_mw": 8120},
+    {"year": 2024, "renewable_percentage": 52.8, "capacity_mw": 8450}
+  ],
+  "co2_emissions_evolution": [
+    {"year": 2020, "emissions_tons": 22500000, "reduction_pct": 0.0},
+    {"year": 2021, "emissions_tons": 21800000, "reduction_pct": -3.1},
+    {"year": 2022, "emissions_tons": 20950000, "reduction_pct": -3.9},
+    {"year": 2023, "emissions_tons": 20200000, "reduction_pct": -3.6},
+    {"year": 2024, "emissions_tons": 18500000, "reduction_pct": -8.4}
+  ]
+}
