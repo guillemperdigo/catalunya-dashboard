@@ -5,7 +5,8 @@ Dashboard elegant i minimalista per visualitzar dades de Catalunya amb múltiple
 ## Característiques
 
 - **Disseny elegant**: Inspirat en The New York Times amb tipografia seriosa, molt espai en blanc i jerarquia clara
-- **Dades mock**: Utilitza fixtures generades amb random walk per validar estructura i UI
+- **Dades reals**: Integració amb Yahoo Finance (yfinance) amb fallback automàtic a dades mock
+- **Sistema de cache intel·ligent**: Cache de 1 hora per dades de preus per optimitzar rendiment
 - **Gràfics interactius**: Visualitzacions amb Plotly.js per preus i volums
 - **Responsive**: Disseny adaptat a dispositius mòbils i desktop
 - **Ràpid**: Server-Side Rendering amb FastAPI i Jinja2
@@ -15,7 +16,8 @@ Dashboard elegant i minimalista per visualitzar dades de Catalunya amb múltiple
 - **Backend**: FastAPI + Jinja2 (SSR)
 - **Frontend**: Tailwind CSS + JavaScript vanilla
 - **Gràfics**: Plotly.js
-- **Dades**: Fixtures JSON (sense base de dades)
+- **Dades**: Yahoo Finance API (yfinance) + Fixtures JSON com a fallback
+- **Cache**: Sistema de cache en disc amb TTL configurable
 - **Servidor**: Uvicorn
 
 ## Instal·lació i ús
@@ -33,13 +35,23 @@ source .venv/bin/activate  # Linux/Mac
 pip install -r requirements.txt
 ```
 
-### 2. Generar dades mock
+### 2. Generar dades mock (opcional)
+
+**Nota**: Amb yfinance instal·lat, el sistema usa dades reals automàticament. Les dades mock només són necessàries com a fallback.
 
 ```bash
 python scripts/gen_mock_data.py
 ```
 
-### 3. Executar el servidor
+### 3. Provar integració amb dades reals (recomanat)
+
+```bash
+python scripts/test_real_data.py
+```
+
+Això verificarà que yfinance funciona i mostrarà dades reals de les empreses.
+
+### 4. Executar el servidor
 
 ```bash
 uvicorn app.main:app --reload
@@ -132,6 +144,11 @@ catalunya-dashboard/
 - `GET /api/companies/{ticker}` - Detalls d'una empresa
 - `GET /api/companies/{ticker}/series?range=1M|3M|1Y` - Sèries de preus
 
+### Gestió de dades
+- `GET /api/data-source` - Informació sobre la font de dades actual (real vs mock)
+- `POST /api/refresh` - Refrescar totes les dades (netejar cache)
+- `POST /api/refresh/{ticker}` - Refrescar dades d'una empresa específica
+
 ### Utilitats
 - `GET /health` - Estat de l'API
 
@@ -196,10 +213,65 @@ Crear nous routers a `app/api/` i incloure'ls a `app/main.py`.
 3. Crear template HTML a `app/templates/`
 4. Afegir ruta a `app/main.py`
 
+## 🔌 Integració amb dades reals
+
+El projecte inclou integració completa amb **Yahoo Finance** per obtenir dades bursàtils reals.
+
+### Activar dades reals
+
+Les dades reals s'activen automàticament si yfinance està instal·lat:
+
+```bash
+pip install yfinance
+python scripts/test_real_data.py  # Verificar funcionament
+```
+
+### Característiques
+
+- ✅ **Automàtic**: Dades reals per defecte, fallback a mock si falla
+- ✅ **Cache intel·ligent**: 1 hora per preus, evita sobrecàrrega de l'API
+- ✅ **Transparent**: El codi no canvia, funciona amb ambdues fonts
+- ✅ **API de gestió**: Endpoints per refrescar i comprovar estat
+
+### Comprovar estat
+
+```bash
+curl http://localhost:8000/api/data-source
+```
+
+Resposta:
+```json
+{
+  "yfinance_available": true,
+  "using_real_data": true,
+  "source": "Yahoo Finance (real-time)",
+  "cache_enabled": true
+}
+```
+
+### Refrescar dades
+
+```bash
+# Refrescar totes les empreses
+curl -X POST http://localhost:8000/api/refresh
+
+# Refrescar només CaixaBank
+curl -X POST http://localhost:8000/api/refresh/CABK.MC
+```
+
+### Documentació completa
+
+Consulta [`docs/REAL_DATA_INTEGRATION.md`](docs/REAL_DATA_INTEGRATION.md) per:
+- Guia d'instal·lació detallada
+- Arquitectura del sistema
+- Configuració avançada
+- Solució de problemes
+- Millors pràctiques
+
 ## Extensibilitat futura
 
 ### Millores dels mòduls actuals
-- **Stocks**: Connectar a APIs financeres reals (Alpha Vantage, Yahoo Finance), alertes de preu
+- **Stocks**: ✅ Dades reals implementades amb Yahoo Finance. Futures: alertes de preu, indicadors tècnics (SMA, RSI)
 - **Demografia**: Afegir projeccions, piràmides poblacionals interactives, flux migratori detallat
 - **Habitatge**: Mapes de calor per zones, prediccions de preus, comparatives per barris
 - **Medi ambient**: Alertes de qualitat de l'aire, seguiment en temps real, històrics més extensos
