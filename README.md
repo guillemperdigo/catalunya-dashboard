@@ -1,6 +1,6 @@
 # Catalunya Dashboard
 
-Dashboard elegant i minimalista per visualitzar dades de Catalunya, començant per indicadors bursàtils d'empreses catalanes. Inspirat en el disseny de The New York Times.
+Dashboard elegant i minimalista per visualitzar dades de Catalunya amb múltiples mòduls: indicadors bursàtils d'empreses catalanes, demografia, habitatge i medi ambient. Inspirat en el disseny de The New York Times.
 
 ## Característiques
 
@@ -61,12 +61,18 @@ catalunya-dashboard/
 │   │   ├── layout.html         # Template base
 │   │   ├── home.html          # Pàgina d'inici
 │   │   ├── companies.html     # Llistat d'empreses
-│   │   └── company_detail.html # Detall d'empresa
+│   │   ├── company_detail.html # Detall d'empresa
+│   │   ├── demographics.html  # Demografia
+│   │   ├── housing.html       # Habitatge
+│   │   └── environment.html   # Medi ambient
 │   └── static/
 │       └── css/
 │           └── main.css       # Estils personalitzats
 ├── data/
 │   ├── companies.json         # Metadades d'empreses
+│   ├── demographics.json      # Dades demogràfiques
+│   ├── housing.json           # Dades d'habitatge
+│   ├── environment.json       # Dades de medi ambient
 │   └── prices/               # Sèries de preus per empresa
 │       ├── CABK.MC.json
 │       ├── GRF.MC.json
@@ -79,22 +85,45 @@ catalunya-dashboard/
 
 ## Pàgines disponibles
 
-### 1. Inici (`/`)
+### Mòdul d'empreses
+
+#### 1. Inici (`/`)
 - Hero amb títol principal
 - 3 empreses destacades amb sparklines
 - Resum del mercat
 
-### 2. Llistat d'empreses (`/companies`)
+#### 2. Llistat d'empreses (`/companies`)
 - Taula amb totes les empreses
 - Cercador per nom/ticker
 - Filtres per borsa i sector
 - Ordenació i paginació
 
-### 3. Detall d'empresa (`/company/{ticker}`)
+#### 3. Detall d'empresa (`/company/{ticker}`)
 - Informació completa de l'empresa
 - Gràfic interactiu de preus (1M/3M/1Y)
 - Gràfic de volum
 - KPIs: preu actual, màxim/mínim 52s, capitalització
+
+### Mòdul de demografia (`/demographics`)
+- Població total i evolució
+- Taxes de natalitat i mortalitat
+- Esperança de vida
+- Dades per regions
+- Distribució per grups d'edat
+
+### Mòdul d'habitatge (`/housing`)
+- Preus mitjans de compra i lloguer (€/m²)
+- Evolució històrica de preus
+- Dades de construcció i permisos
+- Informació d'hipoteques
+- Índex d'accessibilitat
+
+### Mòdul de medi ambient (`/environment`)
+- Qualitat de l'aire (PM2.5, PM10, NO₂, O₃, AQI)
+- Consum i producció energètica
+- Percentatge d'energies renovables
+- Evolució d'emissions de CO₂
+- Reciclatge i gestió de residus
 
 ## API Endpoints
 
@@ -143,6 +172,15 @@ catalunya-dashboard/
 2. Executar `python scripts/gen_mock_data.py`
 3. Reiniciar el servidor
 
+### Actualitzar dades d'altres mòduls
+
+Les dades de demografia, habitatge i medi ambient estan a:
+- `data/demographics.json`
+- `data/housing.json`
+- `data/environment.json`
+
+Editar aquests fitxers directament i reiniciar el servidor.
+
 ### Personalitzar estils
 
 Editar `app/static/css/main.css` per ajustar l'aparença mantenint l'estil NYT.
@@ -151,25 +189,36 @@ Editar `app/static/css/main.css` per ajustar l'aparença mantenint l'estil NYT.
 
 Crear nous routers a `app/api/` i incloure'ls a `app/main.py`.
 
+### Afegir nous mòduls
+
+1. Crear models a `app/models.py`
+2. Afegir dades mock a `data/`
+3. Crear template HTML a `app/templates/`
+4. Afegir ruta a `app/main.py`
+
 ## Extensibilitat futura
 
-### Mòdul Stocks (actual)
-- **Dades reals**: Connectar a APIs financeres (Alpha Vantage, Yahoo Finance)
-- **Base de dades**: Migrar de fixtures a PostgreSQL/SQLite
-- **Alertes**: Notificacions de preu i volum
+### Millores dels mòduls actuals
+- **Stocks**: Connectar a APIs financeres reals (Alpha Vantage, Yahoo Finance), alertes de preu
+- **Demografia**: Afegir projeccions, piràmides poblacionals interactives, flux migratori detallat
+- **Habitatge**: Mapes de calor per zones, prediccions de preus, comparatives per barris
+- **Medi ambient**: Alertes de qualitat de l'aire, seguiment en temps real, històrics més extensos
 
 ### Nous mòduls
-- **Demografia**: Població, natalitat, immigració per comarques
 - **Economia**: PIB, atur, salaris per sectors i regions
-- **Medi ambient**: Qualitat de l'aire, consum energètic, reciclatge
 - **Turisme**: Visitants, ocupació hotelera, esdeveniments
 - **Educació**: Centres, resultats acadèmics, inversió
 - **Sanitat**: Hospitals, llistes d'espera, indicadors de salut
+- **Transport**: Tràfic, transport públic, mobilitat sostenible
+- **Cultura**: Museus, teatres, esdeveniments culturals
 
 ### Funcionalitats generals
+- **Base de dades**: Migrar de fixtures JSON a PostgreSQL/SQLite per millor rendiment
+- **API REST completa**: Endpoints per tots els mòduls amb autenticació
 - **Internacionalització**: Suport per català/espanyol/anglès
 - **Autenticació**: Usuaris i dashboards personalitzats
 - **Mobile app**: PWA o React Native
+- **Exportació de dades**: Descarregar dades en CSV, Excel, PDF
 
 ## Llicència
 
