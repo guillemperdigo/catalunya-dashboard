@@ -4,13 +4,26 @@ from typing import List, Dict, Optional
 from datetime import datetime, timedelta
 from app.models import Company, PriceData, CompanyKPI
 
-# Intentar importar servei de dades reals
+# Intentar importar serveis de dades reals
 try:
     from app.services.stock_data import stock_service
-    REAL_DATA_AVAILABLE = True
+    YFINANCE_AVAILABLE = True
 except ImportError:
-    REAL_DATA_AVAILABLE = False
-    print("⚠️  yfinance no disponible. Usant dades mock.")
+    YFINANCE_AVAILABLE = False
+    stock_service = None
+
+try:
+    from app.services.alphavantage_data import get_alphavantage_service
+    ALPHAVANTAGE_AVAILABLE = True
+except ImportError:
+    ALPHAVANTAGE_AVAILABLE = False
+    get_alphavantage_service = None
+
+# Determinar si tenim alguna font de dades reals
+REAL_DATA_AVAILABLE = YFINANCE_AVAILABLE or ALPHAVANTAGE_AVAILABLE
+
+if not REAL_DATA_AVAILABLE:
+    print("⚠️  Cap servei de dades reals disponible. Usant dades mock.")
 
 
 class DataManager:
@@ -22,8 +35,19 @@ class DataManager:
         # Activar dades reals si està disponible i activat
         self.use_real_data = use_real_data and REAL_DATA_AVAILABLE
         
+        # Obtenir servei d'Alpha Vantage si està disponible
+        self.alphavantage_service = None
+        if ALPHAVANTAGE_AVAILABLE and get_alphavantage_service:
+            self.alphavantage_service = get_alphavantage_service()
+        
+        # Mostrar estat
         if self.use_real_data:
-            print("✅ Servei de dades reals activat (Yahoo Finance)")
+            sources = []
+            if YFINANCE_AVAILABLE:
+                sources.append("Yahoo Finance")
+            if self.alphavantage_service:
+                sources.append("Alpha Vantage")
+            print(f"✅ Serveis de dades reals activats: {', '.join(sources)}")
         else:
             print("📊 Usant dades mock des de fitxers JSON")
     
@@ -39,7 +63,7 @@ class DataManager:
     def get_price_data(self, ticker: str, force_mock: bool = False) -> List[PriceData]:
         """
         Carrega dades de preus per un ticker
-        Intenta obtenir dades reals primer, després fallback a mock
+        Intenta múltiples fonts: Yahoo Finance -> Alpha Vantage -> Mock
         """
         # Si ja està en cache, retornar-lo
         cache_key = f"{ticker}_{'real' if self.use_real_data and not force_mock else 'mock'}"
@@ -50,15 +74,27 @@ class DataManager:
         
         # Intentar obtenir dades reals
         if self.use_real_data and not force_mock:
-            try:
-                real_data = stock_service.get_historical_data(ticker, period="1y")
-                if real_data:
-                    prices = [PriceData(**price) for price in real_data]
-                    print(f"✅ Dades reals obtingudes per {ticker}")
-            except Exception as e:
-                print(f"⚠️  Error obtenint dades reals per {ticker}: {e}")
+            # 1. Intentar amb Yahoo Finance (yfinance)
+            if YFINANCE_AVAILABLE and stock_service:
+                try:
+                    real_data = stock_service.get_historical_data(ticker, period="1y")
+                    if real_data:
+                        prices = [PriceData(**price) for price in real_data]
+                        print(f"✅ Dades obtingudes de Yahoo Finance per {ticker}")
+                except Exception as e:
+                    print(f"⚠️  Yahoo Finance error per {ticker}: {str(e)[:50]}")
+            
+            # 2. Si Yahoo Finance ha fallat, intentar amb Alpha Vantage
+            if not prices and self.alphavantage_service:
+                try:
+                    real_data = self.alphavantage_service.get_historical_data(ticker, period="1y")
+                    if real_data:
+                        prices = [PriceData(**price) for price in real_data]
+                        print(f"✅ Dades obtingudes d'Alpha Vantage per {ticker}")
+                except Exception as e:
+                    print(f"⚠️  Alpha Vantage error per {ticker}: {str(e)[:50]}")
         
-        # Fallback a dades mock si no s'han obtingut dades reals
+        # 3. Fallback a dades mock si no s'han obtingut dades reals
         if not prices:
             prices_path = os.path.join(self.data_dir, "prices", f"{ticker}.json")
             if os.path.exists(prices_path):
@@ -122,7 +158,7 @@ class DataManager:
     
     def get_series_data(self, ticker: str, range_param: str = "1Y") -> List[PriceData]:
         """Obté sèries de preus per un rang específic"""
-        # Mapejar range_param al format de yfinance
+        # Mapejar range_param al format de yfinance/alphavantage
         period_map = {
             "1M": "1mo",
             "3M": "3mo",
@@ -131,13 +167,25 @@ class DataManager:
         
         # Si usem dades reals, obtenir directament el període correcte
         if self.use_real_data:
-            try:
-                period = period_map.get(range_param, "1y")
-                real_data = stock_service.get_historical_data(ticker, period=period)
-                if real_data:
-                    return [PriceData(**price) for price in real_data]
-            except Exception as e:
-                print(f"⚠️  Error obtenint sèrie per {ticker}: {e}")
+            period = period_map.get(range_param, "1y")
+            
+            # Intentar amb Yahoo Finance
+            if YFINANCE_AVAILABLE and stock_service:
+                try:
+                    real_data = stock_service.get_historical_data(ticker, period=period)
+                    if real_data:
+                        return [PriceData(**price) for price in real_data]
+                except Exception as e:
+                    print(f"⚠️  Yahoo Finance error sèrie {ticker}: {str(e)[:50]}")
+            
+            # Intentar amb Alpha Vantage
+            if self.alphavantage_service:
+                try:
+                    real_data = self.alphavantage_service.get_historical_data(ticker, period=period)
+                    if real_data:
+                        return [PriceData(**price) for price in real_data]
+                except Exception as e:
+                    print(f"⚠️  Alpha Vantage error sèrie {ticker}: {str(e)[:50]}")
         
         # Fallback: obtenir totes les dades i filtrar
         prices = self.get_price_data(ticker)
@@ -171,7 +219,13 @@ class DataManager:
         Refresca dades (neteja cache i força re-descàrrega)
         """
         if self.use_real_data:
-            stock_service.clear_cache(ticker)
+            # Netejar cache de Yahoo Finance
+            if YFINANCE_AVAILABLE and stock_service:
+                stock_service.clear_cache(ticker)
+            
+            # Netejar cache d'Alpha Vantage
+            if self.alphavantage_service:
+                self.alphavantage_service.clear_cache(ticker)
         
         if ticker:
             # Netejar cache d'un ticker específic

@@ -76,3 +76,6 @@ coverage.xml
 .mypy_cache/
 .dmypy.json
 dmypy.json
+# Environment variables
+.env
+.env.local

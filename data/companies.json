@@ -4,5 +4,7 @@
   {"name":"Cellnex","ticker":"CLNX.MC","exchange":"BME","sector":"Telecom","hq_province":"Barcelona"},
   {"name":"Fluidra","ticker":"FDR.MC","exchange":"BME","sector":"Industrials","hq_province":"Barcelona"},
   {"name":"Inmobiliaria Colonial","ticker":"COL.MC","exchange":"BME","sector":"Real Estate","hq_province":"Barcelona"},
-  {"name":"Almirall","ticker":"ALM.MC","exchange":"BME","sector":"Pharma","hq_province":"Barcelona"}
+  {"name":"Almirall","ticker":"ALM.MC","exchange":"BME","sector":"Pharma","hq_province":"Barcelona"},
+  {"name":"Apple","ticker":"AAPL","exchange":"NASDAQ","sector":"Technology","hq_province":"California (US)"},
+  {"name":"Microsoft","ticker":"MSFT","exchange":"NASDAQ","sector":"Technology","hq_province":"Washington (US)"}
 ]
